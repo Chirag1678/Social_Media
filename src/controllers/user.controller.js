@@ -4,6 +4,27 @@ import { User } from "../models/user.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js"; 
 
+const generateAccessAndRefreshTokens = async (userId) => {
+    try {
+        //Find user by id
+        const user = await User.findById(userId);
+        if(!user) throw new ApiError(404, "User not found");
+
+        //Generate access and refresh tokens
+        const accessToken = user.generateAccessToken();
+        const refreshToken = user.generateRefreshToken();
+
+        //Update refresh token in database
+        user.refreshToken = refreshToken;
+        await user.save({validateBeforeSave: false}); //validateBeforeSave is set to false to avoid validation error while updating the refresh token
+
+        //Return access and refresh tokens
+        return {accessToken, refreshToken};
+    } catch (error) {
+        throw new ApiError(500, "Failed to generate access and refresh tokens");
+    }
+}
+
 const registerUser = asyncHandler(async (req,res) => {
     //testing register user
     // res.status(200).json({
@@ -38,7 +59,10 @@ const registerUser = asyncHandler(async (req,res) => {
 
     //4. check for images and avatar
     const avatarLocalPath = req.files?.avatar[0]?.path; //avatar is the file uploaded by the user, [0] is used to get the first file from the array
-    const coverImageLocalPath = req.files?.coverImage[0]?.path; //coverImage is the file uploaded by the user, [0] is used to get the first file from the array
+    let coverImageLocalPath;
+    if(req.files && req.files.coverImage){
+        coverImageLocalPath = req.files.coverImage[0]?.path; //coverImage is the file uploaded by the user, [0] is used to get the first file from the array
+    }
     if(!avatarLocalPath) throw new ApiError(400, "Avatar is required");
 
     //5. upload files to cloudinary, avatar upload check
@@ -70,9 +94,69 @@ const registerUser = asyncHandler(async (req,res) => {
 });
 
 const loginUser = asyncHandler(async (req,res) => {
-    res.status(200).json({
-        message: "ok"
-    })
+    //Steps to login user
+    //1. get email and password from frontend
+    //2. validate request body
+    //3. check if user exists{email based or username based} 
+    //4. check if password is correct
+    //5. create and assign a token (access token and refresh token)
+    //6. send cookie to frontend
+    //7. send response to frontend
+
+    //Writing logic
+    //1. get email, username and password from frontend
+    const { email, username, password } = req.body;
+
+    //2. validate request body
+    if(!(email || username)) throw new ApiError(400, "Either email or username is required"); //if email or username is not provided, throw an error
+    if(!password) throw new ApiError(400, "Password is required"); //if password is not provided, throw an error
+
+    //3. check if user exists{email based or username based} and password is correct
+    const user = await User.findOne({ //findOne is used to find the first user that matches the condition
+        $or: [{email}, {username}] //$or is used to check if the email or username already exists
+    });
+    if(!user) throw new ApiError(404, "User does not exist");
+
+    //4. check if password is correct
+    const isPasswordValid = await user.isPasswordCorrect(password);
+    if(!isPasswordValid) throw new ApiError(401, "Invalid user credentials");
+
+    //5. create and assign a token (access token and refresh token)
+    const {accessToken, refreshToken} = await generateAccessAndRefreshTokens(user._id);
+
+    //6-7. send cookie to frontend & send response to frontend
+    const cookieOptions={
+        httpOnly: true, //httpOnly is used to prevent client side script from accessing the cookie
+        secure: true, //secure is used to send the cookie over HTTPS
+    }
+    const loggedInUser = await User.findById(user._id).select("-password -refreshToken"); //select is used to select the fields to be returned, -password is used to not return the password field, -refreshToken is used to not return the refreshToken field
+    
+    res.status(200)
+    .cookie("accessToken", accessToken, cookieOptions) //cookie is sent to frontend with the name accessToken
+    .cookie("refreshToken", refreshToken, cookieOptions) //cookie is sent to frontend with the name refreshToken
+    .json(new ApiResponse(200, {user: loggedInUser, accessToken, refreshToken}, "User logged in successfully")); //response is sent to frontend
 });
 
-export {registerUser, loginUser};
+const logoutUser = asyncHandler(async (req,res) => {
+    await User.findByIdAndUpdate(
+        req.user._id, 
+        {
+            $set: {
+                refreshToken: undefined //refresh token is set to undefined
+            }
+        }, 
+        {new: true} //new is used to return the updated user
+    );
+
+    const cookieOptions={
+        httpOnly: true, //httpOnly is used to prevent client side script from accessing the cookie
+        secure: true, //secure is used to send the cookie over HTTPS
+    }
+
+    res.status(200)
+    .clearCookie("accessToken", cookieOptions) //cookie is cleared from frontend with the name accessToken
+    .clearCookie("refreshToken", cookieOptions) //cookie is cleared from frontend with the name refreshToken
+    .json(new ApiResponse(200, {}, "User logged out successfully")); //response is sent to frontend
+}); 
+
+export {registerUser, loginUser, logoutUser};
