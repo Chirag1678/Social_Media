@@ -205,4 +205,105 @@ const refreshAccessToken = asyncHandler(async (req,res) => {
     }
 });
 
-export {registerUser, loginUser, logoutUser, refreshAccessToken};
+const changeCurrentPassword = asyncHandler(async (req,res) => {
+    const {currentPassword, newPassword} = req.body; //get current password and new password from frontend
+
+    //check if current password and new password are provided
+    if(!currentPassword || !newPassword) throw new ApiError(400, "Current password and new password are required");
+
+    //find user by id and check if the password is correct
+    const user = await User.findById(req.user?._id);
+    const isPasswordCorrect = await user.isPasswordCorrect(currentPassword); //check if the current password is correct
+
+    //if password is not correct, throw an error
+    if(!isPasswordCorrect) throw new ApiError(401, "Invalid current password");
+
+    //if password is correct, update the password
+    user.password = newPassword;
+    await user.save({validateBeforeSave:false}); //save the updated user, bcrypt will hash the password before saving, validateBeforeSave is set to false to avoid validation error while updating the password
+
+    //send response to frontend
+    res.status(200).json(new ApiResponse(200, {}, "Password changed successfully"));
+});
+
+const getCurrentuser = asyncHandler(async (req,res) => {
+    res.status(200).json(new ApiResponse(200, req.user, "User found successfully")); //send response to frontend
+});
+
+const updateAccountDetails = asyncHandler(async (req,res) => {
+    const {fullName, email, username}=req.body; //get user details from frontend
+
+    //if user details are not provided, throw an error
+    if(!fullName || !email || !username) throw new ApiError(400, "Nothing to update");
+
+    //check if username or email already exists
+    const existing = await User.findOne({
+        $or: [{email}, {username}],
+        _id: {$ne: req.user?._id} //exclude the current user
+    });
+
+    //if username or email already exists, throw an error
+    if(existing) throw new ApiError(409, "Username or email already exists");
+
+    //find user by id and update the details
+    const user = await User.findByIdAndUpdate(
+        req.user?._id, //find user by id
+        {fullName, email, username}, //update the user details
+        {new: true} //return the updated user
+    ).select("-password -refreshToken"); //select is used to select the fields to be returned, -password is used to not return the password field, -refreshToken is used to not return the refreshToken field
+
+    //send response to frontend
+    res.status(200).json(new ApiResponse(200, user, "Account details updated successfully"));
+});
+
+const updateUserAvatar = asyncHandler(async (req,res) => {
+    const avatarLocalPath = req.file?.path; //get the avatar file uploaded by the user
+
+    //if avatar file is not provided, throw an error
+    if(!avatarLocalPath) throw new ApiError(400, "Avatar is required");
+
+    //upload the avatar file to cloudinary
+    const avatar = await uploadOnCloudinary(avatarLocalPath);
+
+    //if avatar file is not uploaded, throw an error
+    if(!avatar.url) throw new ApiError(500, "Failed to upload avatar");
+
+    //find user by id and update the avatar
+    const user = await User.findByIdAndUpdate(
+        req.user?._id, //find user by id
+        {
+            $set: {avatar: avatar.url} //update the avatar, set is used to update the avatar only
+        },
+        {new: true} //return the updated user
+    ).select("-password -refreshToken"); //select is used to select the fields to be returned, -password is used to not return the password field, -refreshToken is used to not return the refreshToken field
+
+    //send response to frontend 
+    res.status(200).json(new ApiResponse(200, user, "Avatar updated successfully"));
+});
+
+const updateUserCoverImage = asyncHandler(async (req,res) => {
+    const coverImageLocalPath = req.file?.path; //get the cover image file uploaded by the user
+
+    //if cover image file is not provided, throw an error
+    if(!coverImageLocalPath) throw new ApiError(400, "Cover image is required");
+
+    //upload the cover image file to cloudinary
+    const coverImage = await uploadOnCloudinary(coverImageLocalPath);
+
+    //if cover image file is not uploaded, throw an error
+    if(!coverImage.url) throw new ApiError(500, "Failed to upload cover image");
+
+    //find user by id and update the cover image
+    const user = await User.findByIdAndUpdate(
+        req.user?._id, //find user by id
+        {
+            $set: {coverImage: coverImage.url} //update the cover image, set is used to update the cover image only
+        },
+        {new: true} //return the updated user
+    ).select("-password -refreshToken"); //select is used to select the fields to be returned, -password is used to not return the password field, -refreshToken is used to not return the refreshToken field
+
+    //send response to frontend
+    res.status(200).json(new ApiResponse(200, user, "Cover image updated successfully"));
+});
+
+export {registerUser, loginUser, logoutUser, refreshAccessToken, changeCurrentPassword, getCurrentuser, updateAccountDetails, updateUserAvatar, updateUserCoverImage}; //export the functions to be used in routes
