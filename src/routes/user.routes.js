@@ -1,5 +1,5 @@
 import { Router} from "express";
-import { registerUser, loginUser, logoutUser, refreshAccessToken } from "../controllers/user.controller.js";
+import { registerUser, loginUser, logoutUser, refreshAccessToken, changeCurrentPassword, getCurrentuser, updateAccountDetails, updateUserAvatar, updateUserCoverImage, getUserChannel, getWatchHistory } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 
@@ -24,5 +24,11 @@ router.route("/login").post(loginUser); //login user
 //secure routes
 router.route("/logout").post(verifyJWT, logoutUser); //logout user, verifyJWT is used to verify the access token
 router.route("/refresh-token").post(refreshAccessToken); //refresh access token when it expires
-
+router.route("/change-password").post(verifyJWT, changeCurrentPassword); //change password, verifyJWT is used to verify the access token
+router.route("/current-user").get(verifyJWT, getCurrentuser); //get current user, verifyJWT is used to verify the access token
+router.route("/update-profile").patch(verifyJWT, updateAccountDetails); //update account details, verifyJWT is used to verify the access token
+router.route("/update-avatar").patch(verifyJWT, upload.single("avatar"), updateUserAvatar); //update avatar, verifyJWT is used to verify the access token
+router.route("/update-cover-image").patch(verifyJWT, upload.single("coverImage"), updateUserCoverImage); //update cover image, verifyJWT is used to verify the access token
+router.route("/c/:username").get(verifyJWT, getUserChannel); //get current user channel, verifyJWT is used to verify the access token
+router.route("/history").get(verifyJWT, getWatchHistory); //get watch history, verifyJWT is used to verify the access token
 export default router;
