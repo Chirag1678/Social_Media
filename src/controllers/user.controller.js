@@ -268,6 +268,12 @@ const updateUserAvatar = asyncHandler(async (req,res) => {
     //if avatar file is not uploaded, throw an error
     if(!avatar.url) throw new ApiError(500, "Failed to upload avatar");
 
+    //delete the old file from cloudinary
+    if(req.user?.avatar) {
+        const oldAvatarPublicId = req.user.avatar.split('/').pop().split('.')[0]; // Extract public_id from the avatar URL
+        await deleteFromCloudinary(oldAvatarPublicId); // Use the extracted public_id to delete the old avatar
+    }
+    
     //find user by id and update the avatar
     const user = await User.findByIdAndUpdate(
         req.user?._id, //find user by id
@@ -292,6 +298,12 @@ const updateUserCoverImage = asyncHandler(async (req,res) => {
 
     //if cover image file is not uploaded, throw an error
     if(!coverImage.url) throw new ApiError(500, "Failed to upload cover image");
+
+    //delete the old file from cloudinary
+    if(req.user?.coverImage) {
+        const oldCoverImageId = req.user.coverImage.split('/').pop().split('.')[0]; // Extract public_id from the cover image URL
+        await deleteFromCloudinary(oldCoverImageId); // Use the extracted public_id to delete the old cover image
+    }
 
     //find user by id and update the cover image
     const user = await User.findByIdAndUpdate(
