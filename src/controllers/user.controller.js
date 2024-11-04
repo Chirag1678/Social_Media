@@ -318,4 +318,68 @@ const updateUserCoverImage = asyncHandler(async (req,res) => {
     res.status(200).json(new ApiResponse(200, user, "Cover image updated successfully"));
 });
 
-export {registerUser, loginUser, logoutUser, refreshAccessToken, changeCurrentPassword, getCurrentuser, updateAccountDetails, updateUserAvatar, updateUserCoverImage}; //export the functions to be used in routes
+const getUserChannel = asyncHandler(async (req,res) => {
+    const {username} = req.params; //get the username from the params
+
+    //check if username is provided
+    if(!username?.trim()) throw new ApiError(400, "Username is required");
+
+    //find user by username and use aggregation to get the user's channel
+    const channel = await User.aggregate([
+        {
+            $match: {
+                username: username?.toLowerCase() //match the username
+            }
+        },
+        {
+            $lookup: {
+                from: "subscriptions", //lookup the subscriptions collection
+                localField: "_id", //match the _id field in the users collection
+                foreignField: "channel", //match the channel field in the subscriptions collection
+                as: "subscribers" //store the result in the subscribers field
+            }
+        },
+        {
+            $lookup: {
+                from: "subscriptions", //lookup the subscriptions collection
+                localField: "_id", //match the _id field in the users collection
+                foreignField: "subscriber", //match the subscriber field in the subscriptions collection
+                as: "subscribedTo" //store the result in the subscribedTo field
+            }
+        },
+        {
+            $addFields: {
+                subscriberCount: {$size: "$subscribers"}, //get the count of subscribers
+                subscribedToCount: {$size: "$subscribedTo"}, //get the count of subscribedTo
+                isSubscribed: {
+                    $cond: { //conditional statement
+                        if: {
+                            $in: [req.user?._id, "$subscribers.subscriber"] //check if the user is in the subscribers list
+                        },
+                        then: true, //if the user is in the subscribers list, then set isSubscribed to true
+                        else: false //if the user is not in the subscribers list, then set isSubscribed to false
+                    }
+                }
+            }
+        },
+        {
+            $project: {
+                fullName: 1, //include the fullName field
+                username: 1, //include the username field
+                subscriberCount: 1, //include the subscriberCount field
+                subscribedToCount: 1, //include the subscribedToCount field
+                isSubscribed: 1, //include the isSubscribed field
+                avatar: 1, //include the avatar field
+                coverImage: 1, //include the coverImage field
+            }
+        }
+    ])
+
+    //if channel is not found, throw an error
+    if(!channel || !channel.length) throw new ApiError(404, "Channel not found");
+
+    //send response to frontend
+    res.status(200).json(new ApiResponse(200, channel[0], "Channel found successfully"));
+});
+
+export {registerUser, loginUser, logoutUser, refreshAccessToken, changeCurrentPassword, getCurrentuser, updateAccountDetails, updateUserAvatar, updateUserCoverImage, getUserChannel}; //export the functions to be used in routes
