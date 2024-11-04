@@ -382,4 +382,50 @@ const getUserChannel = asyncHandler(async (req,res) => {
     res.status(200).json(new ApiResponse(200, channel[0], "Channel found successfully"));
 });
 
-export {registerUser, loginUser, logoutUser, refreshAccessToken, changeCurrentPassword, getCurrentuser, updateAccountDetails, updateUserAvatar, updateUserCoverImage, getUserChannel}; //export the functions to be used in routes
+const getWatchHistory = asyncHandler(async (req,res) => {
+    const user = await User.aggregate([
+        {
+            $match: {
+                // _id: req.user?._id //match the user by id, but it will give error because req.user._id provides you a string
+                _id: new mongoose.Types.ObjectId(req.user._id) //match the user by id
+            }
+        },
+        {
+            $lookup: {
+                from: "videos", //lookup the videos collection
+                localField: "watchHistory", //match the watchHistory field in the users collection
+                foreignField: "_id", //match the _id field in the videos collection
+                as: "watchHistory", //store the result in the watchHistory field
+                pipeline: [
+                    {
+                        $lookup: {
+                            from: "users", //lookup the users collection
+                            localField: "owner", //match the owner field in the videos collection
+                            foreignField: "_id", //match the _id field in the users collection
+                            as: "owner", //store the result in the owner field
+                            pipeline: [
+                                {
+                                    $project: {
+                                        fullName: 1, //include the fullName field
+                                        username: 1, //include the username field
+                                        avatar: 1, //include the avatar field
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        $addFields: {
+                            owner: {$arrayElemAt: ["$owner", 0]} //get the owner field
+                        }
+                    }
+                ]
+            }
+        }
+    ]);
+
+    //send response to frontend
+    res.status(200).json(new ApiResponse(200, user[0].watchHistory, "Watch history found successfully"));
+});
+
+export {registerUser, loginUser, logoutUser, refreshAccessToken, changeCurrentPassword, getCurrentuser, updateAccountDetails, updateUserAvatar, updateUserCoverImage, getUserChannel, getWatchHistory}; //export the functions to be used in routes
