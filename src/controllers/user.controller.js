@@ -1,7 +1,8 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/apiError.js";
 import { User } from "../models/user.model.js";
-import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import { uploadOnCloudinary, deleteFromCloudinary } from "../utils/cloudinary.js";
+import mongoose from "mongoose";
 import { ApiResponse } from "../utils/ApiResponse.js"; 
 import jwt from "jsonwebtoken";
 
@@ -142,8 +143,8 @@ const logoutUser = asyncHandler(async (req,res) => {
     await User.findByIdAndUpdate(
         req.user._id, 
         {
-            $set: {
-                refreshToken: undefined //refresh token is set to undefined
+            $unset: {
+                refreshToken: 1 //refresh token field is removed from the user
             }
         }, 
         {new: true} //new is used to return the updated user
@@ -186,16 +187,16 @@ const refreshAccessToken = asyncHandler(async (req,res) => {
         }
     
         // Generate new access and refresh tokens
-        const {accessToken,newRefreshToken}=await generateAccessAndRefreshTokens(user._id);
+        const {accessToken,refreshToken}=await generateAccessAndRefreshTokens(user._id);
     
         // Send the response with new tokens in cookies and JSON body
         res.status(200)
         .cookie("accessToken", accessToken, cookieOptions)
-        .cookie("refreshToken", newRefreshToken, cookieOptions)
+        .cookie("refreshToken", refreshToken, cookieOptions)
         .json(
             new ApiResponse(
                 200,
-                {accessToken, refreshToken: newRefreshToken},
+                {accessToken,refreshToken},
                 "Access token refreshed successfully"
             )
         )
