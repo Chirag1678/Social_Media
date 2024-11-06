@@ -21,7 +21,25 @@ const getAllVideos = asyncHandler(async (req, res) => {
     };
 
     //
-    var aggregate = Video.aggregate();
+    var aggregate = Video.aggregate([
+        {
+            $lookup: {
+                from: "users",
+                localField: "owner",
+                foreignField: "_id",
+                as: "owner",
+                pipeline: [
+                    {
+                        $project: {
+                            username: 1,
+                            email: 1,
+                            avatar: 1
+                        }
+                    },
+                ]
+            }
+        },
+    ]);
 
     //get videos based on query parameters
     const videos = await Video.aggregatePaginate(aggregate,queryParam,(err,res)=>{
@@ -104,8 +122,15 @@ const getVideoById = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Video not found")
     }
 
+    //if video is found, increment views and add it to user watch history
+    video.views += 1;
+    await video.save();
+    const user = await User.findById(req.user._id);
+    user.watchHistory.push(video._id);
+    await user.save();
+
     //return success response
-    res.status(200).json(new ApiResponse(200, video, "Video found"))
+    res.status(200).json(new ApiResponse(200, {video,user}, "Video found"))
 })
 
 const updateVideo = asyncHandler(async (req, res) => {
