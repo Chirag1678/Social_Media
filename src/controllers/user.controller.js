@@ -235,7 +235,7 @@ const updateAccountDetails = asyncHandler(async (req,res) => {
     const {fullName, email, username}=req.body; //get user details from frontend
 
     //if user details are not provided, throw an error
-    if(!fullName || !email || !username) throw new ApiError(400, "Nothing to update");
+    if(!(fullName || email || username)) throw new ApiError(400, "Nothing to update");
 
     //check if username or email already exists
     const existing = await User.findOne({
@@ -252,6 +252,10 @@ const updateAccountDetails = asyncHandler(async (req,res) => {
         {fullName, email, username}, //update the user details
         {new: true} //return the updated user
     ).select("-password -refreshToken"); //select is used to select the fields to be returned, -password is used to not return the password field, -refreshToken is used to not return the refreshToken field
+
+
+    //if user is not updated, throw an error
+    if(!user) throw new ApiError(500, "Failed to update account details");
 
     //send response to frontend
     res.status(200).json(new ApiResponse(200, user, "Account details updated successfully"));
@@ -284,6 +288,9 @@ const updateUserAvatar = asyncHandler(async (req,res) => {
         {new: true} //return the updated user
     ).select("-password -refreshToken"); //select is used to select the fields to be returned, -password is used to not return the password field, -refreshToken is used to not return the refreshToken field
 
+    //check if user is updated
+    if(!user) throw new ApiError(500, "Failed to update avatar");
+
     //send response to frontend 
     res.status(200).json(new ApiResponse(200, user, "Avatar updated successfully"));
 });
@@ -314,6 +321,9 @@ const updateUserCoverImage = asyncHandler(async (req,res) => {
         },
         {new: true} //return the updated user
     ).select("-password -refreshToken"); //select is used to select the fields to be returned, -password is used to not return the password field, -refreshToken is used to not return the refreshToken field
+
+    //check if user is updated
+    if(!user) throw new ApiError(500, "Failed to update cover image");
 
     //send response to frontend
     res.status(200).json(new ApiResponse(200, user, "Cover image updated successfully"));
