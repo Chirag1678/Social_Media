@@ -5,7 +5,6 @@ import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
-
 const toggleSubscription = asyncHandler(async (req, res) => {
     // TODO: toggle subscription
 
@@ -52,9 +51,9 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
     }
 
     // get subscribers of the channel
-    const subscribers = Subscription.aggregate([
+    const subscribers = await Subscription.aggregate([
         {
-            $match: {channel: mongoose.Types.ObjectId(channelId)}
+            $match: {channel: new mongoose.Types.ObjectId(channelId)}
         },
         {
             $lookup: {
@@ -83,7 +82,7 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
 // controller to return channel list to which user has subscribed
 const getSubscribedChannels = asyncHandler(async (req, res) => {
     // get subscriberId from req.params
-    const { subscriberId } = req.params;
+    const subscriberId = req.user?._id;
 
     // check if subscriberId is valid
     if(!isValidObjectId(subscriberId)){
@@ -91,9 +90,12 @@ const getSubscribedChannels = asyncHandler(async (req, res) => {
     }
 
     // get channels to which user has subscribed
-    const subscribedChannels = Subscription.aggregate([
+    const subscribedChannels = await Subscription.aggregate([
         {
-            $match: {subscriber: mongoose.Types.ObjectId(subscriberId)}
+            $match: {
+                // find subscriptions of the user
+                subscriber: new mongoose.Types.ObjectId(subscriberId)
+            }
         },
         {
             $lookup: {
@@ -114,6 +116,9 @@ const getSubscribedChannels = asyncHandler(async (req, res) => {
             }
         }
     ]);
+
+    // return success response
+    res.status(200).json(new ApiResponse(200, subscribedChannels, "Subscribed channels found"));
 })
 
-export { toggleSubscription, getUserChannelSubscribers, getSubscribedChannels }
+export { toggleSubscription, getUserChannelSubscribers, getSubscribedChannels };
