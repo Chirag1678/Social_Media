@@ -439,4 +439,4 @@ const getWatchHistory = asyncHandler(async (req,res) => {
     res.status(200).json(new ApiResponse(200, user[0].watchHistory, "Watch history found successfully"));
 });
 
-export {registerUser, loginUser, logoutUser, refreshAccessToken, changeCurrentPassword, getCurrentuser, updateAccountDetails, updateUserAvatar, updateUserCoverImage, getUserChannel, getWatchHistory}; //export the functions to be used in routes
+export { registerUser, loginUser, logoutUser, refreshAccessToken, changeCurrentPassword, getCurrentuser, updateAccountDetails, updateUserAvatar, updateUserCoverImage, getUserChannel, getWatchHistory }; //export the functions to be used in routes

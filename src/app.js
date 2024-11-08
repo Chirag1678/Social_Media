@@ -19,11 +19,15 @@ import userRouter from "./routes/user.routes.js";
 import videoRouter from "./routes/video.routes.js";
 import subscriptionRouter from "./routes/subscription.routes.js";
 import tweetRouter from "./routes/tweet.routes.js";
+import playlistRouter from "./routes/playlist.routes.js";
+import likeRouter from "./routes/like.routes.js";
 
 //routes declaration
 app.use("/api/v1/users", userRouter); //makes it http://localhost:8000/api/v1/users/:route
 app.use("/api/v1/videos", videoRouter); //makes it http://localhost:8000/api/v1/videos/:route
 app.use("/api/v1/subscriptions", subscriptionRouter); //makes it http://localhost:8000/api/v1/subscriptions/:route
 app.use("/api/v1/tweets", tweetRouter); //makes it http://localhost:8000/api/v1/tweets/:route
+app.use("/api/v1/playlist", playlistRouter); //makes it http://localhost:8000/api/v1/playlist/:route
+app.use("/api/v1/likes", likeRouter); //makes it http://localhost:8000/api/v1/likes/:route
 
 export { app };

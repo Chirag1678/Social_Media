@@ -1,10 +1,10 @@
 import mongoose, { isValidObjectId } from "mongoose"
-import {Tweet} from "../models/tweet.model.js"
-import {User} from "../models/user.model.js"
-import {ApiError} from "../utils/apiError.js"
+import { Tweet } from "../models/tweet.model.js"
+import { User } from "../models/user.model.js"
+import { ApiError } from "../utils/apiError.js"
 import { uploadOnCloudinary, deleteFromCloudinary } from "../utils/cloudinary.js"
-import {ApiResponse} from "../utils/ApiResponse.js"
-import {asyncHandler} from "../utils/asyncHandler.js"
+import { ApiResponse } from "../utils/ApiResponse.js"
+import { asyncHandler } from "../utils/asyncHandler.js"
 
 const createTweet = asyncHandler(async (req, res) => {
     //get content from req.body and image from req.file
@@ -99,8 +99,6 @@ const getUserTweets = asyncHandler(async (req, res) => {
 })
 
 const updateTweet = asyncHandler(async (req, res) => {
-    //TODO: update tweet
-
     //get tweetId from req.params
     const { tweetId } = req.params;
 
@@ -155,8 +153,6 @@ const updateTweet = asyncHandler(async (req, res) => {
 })
 
 const deleteTweet = asyncHandler(async (req, res) => {
-    //TODO: delete tweet
-
     //get tweetId from req.params
     const { tweetId } = req.params;
 
