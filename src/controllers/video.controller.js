@@ -7,8 +7,6 @@ import mongoose, { isValidObjectId } from "mongoose";
 import { ApiResponse } from "../utils/ApiResponse.js"; 
 
 const getAllVideos = asyncHandler(async (req, res) => {
-    //TODO: get all videos based on query, sort, pagination
-
     const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query; //get query parameters
 
     //set query parameters
@@ -54,8 +52,6 @@ const getAllVideos = asyncHandler(async (req, res) => {
 })
 
 const publishAVideo = asyncHandler(async (req, res) => {
-    // TODO: get video, upload to cloudinary, create video
-
     //get video and thumbnail from req.files
     const { title, description} = req.body
 
@@ -104,8 +100,6 @@ const publishAVideo = asyncHandler(async (req, res) => {
 });
 
 const getVideoById = asyncHandler(async (req, res) => {
-    //TODO: get video by id
-
     //get videoId from req.params
     const { videoId } = req.params
 
@@ -134,8 +128,6 @@ const getVideoById = asyncHandler(async (req, res) => {
 })
 
 const updateVideo = asyncHandler(async (req, res) => {
-    //TODO: update video details like title, description, thumbnail
-
     //get videoId from req.params
     const { videoId } = req.params;
 
@@ -214,8 +206,6 @@ const updateVideo = asyncHandler(async (req, res) => {
 })
 
 const deleteVideo = asyncHandler(async (req, res) => {
-    //TODO: delete video
-
     //get videoId from req.params
     const { videoId } = req.params;
 
@@ -246,8 +236,6 @@ const deleteVideo = asyncHandler(async (req, res) => {
 })
 
 const togglePublishStatus = asyncHandler(async (req, res) => {
-    //TODO: toggle publish status
-
     //get videoId from req.params
     const { videoId } = req.params;
 

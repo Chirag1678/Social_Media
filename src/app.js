@@ -18,10 +18,12 @@ app.use(cookieParser()); // for parsing cookies, it parses the cookies attached 
 import userRouter from "./routes/user.routes.js";
 import videoRouter from "./routes/video.routes.js";
 import subscriptionRouter from "./routes/subscription.routes.js";
+import tweetRouter from "./routes/tweet.routes.js";
 
 //routes declaration
 app.use("/api/v1/users", userRouter); //makes it http://localhost:8000/api/v1/users/:route
 app.use("/api/v1/videos", videoRouter); //makes it http://localhost:8000/api/v1/videos/:route
 app.use("/api/v1/subscriptions", subscriptionRouter); //makes it http://localhost:8000/api/v1/subscriptions/:route
+app.use("/api/v1/tweets", tweetRouter); //makes it http://localhost:8000/api/v1/tweets/:route
 
 export { app };
