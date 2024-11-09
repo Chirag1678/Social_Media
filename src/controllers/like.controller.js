@@ -22,7 +22,7 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
     }
 
     //check if user has liked the video
-    const like = await Like.findOne({video: videoId, user: userId});
+    const like = await Like.findOne({video:videoId, likedBy: userId});
 
     //if user has liked the video, unlike the video
     if(like){
@@ -31,7 +31,7 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
     }
 
     //like the video
-    const likedVideo = await Like.create({video: videoId, user: userId});
+    const likedVideo = await Like.create({video: videoId, likedBy: userId});
 
     //check if video is liked
     if(!likedVideo){
@@ -60,7 +60,7 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
     }
 
     //check if user has liked the comment
-    const like = await Like.findOne({comment: commentId, user: userId});
+    const like = await Like.findOne({comment: commentId, likedBy: userId});
 
     //if user has liked the comment, unlike the comment
     if(like){
@@ -69,7 +69,7 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
     }
 
     //like the comment
-    const likedComment = await Like.create({comment: commentId, user: userId});
+    const likedComment = await Like.create({comment: commentId, likedBy: userId});
 
     //check if comment is liked
     if(!likedComment){
@@ -98,7 +98,7 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
     }
 
     //check if user has liked the tweet
-    const like = await Like.findOne({tweet: tweetId, user: userId});
+    const like = await Like.findOne({tweet: tweetId, likedBy: userId});
 
     //if user has liked the tweet, unlike the tweet
     if(like){
@@ -107,7 +107,7 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
     }
 
     //like the tweet
-    const likedTweet = await Like.create({tweet: tweetId, user: userId});
+    const likedTweet = await Like.create({tweet: tweetId, likedBy: userId});
 
     //check if tweet is liked
     if(!likedTweet){
@@ -129,7 +129,32 @@ const getLikedVideos = asyncHandler(async (req, res) => {
     }
 
     //get all videos liked by the user
-    const likedVideos = await Like.find({user: userId}).populate("video");
+    const likedVideos = await Like.aggregate([
+        {
+            $match: {
+                likedBy: new mongoose.Types.ObjectId(userId),
+            }
+        },
+        {
+            $lookup: {
+                from: "videos",
+                localField: "video",
+                foreignField: "_id",
+                as: "video"
+            }
+        },
+        {
+            $unwind: "$video"
+        },
+        {
+            $project: {
+                "video.videoFile": 1,
+                "video.title": 1,
+                "video.description": 1,
+                "video.thumbnail": 1,
+            }
+        },
+    ]);
 
     //check if liked videos are found
     if(!likedVideos){
