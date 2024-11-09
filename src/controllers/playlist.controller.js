@@ -62,7 +62,17 @@ const getUserPlaylists = asyncHandler(async (req, res) => {
                 from: "videos",
                 localField: "videos",
                 foreignField: "_id",
-                as: "videos"
+                as: "videos",
+                pipeline: [
+                    {
+                        $project: {
+                            title: 1,
+                            description: 1,
+                            videoFile: 1,
+                            thumbnail: 1
+                        }
+                    }
+                ]
             }
         },
         {
@@ -160,7 +170,7 @@ const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
     await playlist.save();
 
     //return success response
-    res.status(200).json(new ApiResponse(200, {playlist}, "Video removed from playlist"));
+    res.status(200).json(new ApiResponse(200, null, "Video removed from playlist"));
 })
 
 const deletePlaylist = asyncHandler(async (req, res) => {
@@ -172,6 +182,14 @@ const deletePlaylist = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Invalid playlist id");
     }
 
+    //check if playlist exists
+    const playlist = await Playlist.findById(playlistId);
+
+    //check if playlist is found
+    if(!playlist){
+        throw new ApiError(404, "Playlist not found");
+    }
+    
     // delete playlist
     await Playlist.findByIdAndDelete(playlistId);
 
