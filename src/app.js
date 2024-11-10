@@ -22,6 +22,7 @@ import tweetRouter from "./routes/tweet.routes.js";
 import playlistRouter from "./routes/playlist.routes.js";
 import likeRouter from "./routes/like.routes.js";
 import commentRouter from "./routes/comment.routes.js";
+import dashboardRouter from "./routes/dashboard.routes.js";
 
 //routes declaration
 app.use("/api/v1/users", userRouter); //makes it http://localhost:8000/api/v1/users/:route
@@ -31,5 +32,6 @@ app.use("/api/v1/tweets", tweetRouter); //makes it http://localhost:8000/api/v1/
 app.use("/api/v1/playlist", playlistRouter); //makes it http://localhost:8000/api/v1/playlist/:route
 app.use("/api/v1/likes", likeRouter); //makes it http://localhost:8000/api/v1/likes/:route
 app.use("/api/v1/comments", commentRouter); //makes it http://localhost:8000/api/v1/comments/:route
+app.use("/api/v1/dashboard", dashboardRouter); //makes it http://localhost:8000/api/v1/dashboard/:route
 
 export { app };
