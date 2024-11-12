@@ -23,8 +23,10 @@ import playlistRouter from "./routes/playlist.routes.js";
 import likeRouter from "./routes/like.routes.js";
 import commentRouter from "./routes/comment.routes.js";
 import dashboardRouter from "./routes/dashboard.routes.js";
+import healthcheckRouter from "./routes/healthcheck.routes.js";
 
 //routes declaration
+app.use("/api/v1/healthcheck", healthcheckRouter); //makes it http://localhost:8000/api/v1/healthcheck/:route
 app.use("/api/v1/users", userRouter); //makes it http://localhost:8000/api/v1/users/:route
 app.use("/api/v1/videos", videoRouter); //makes it http://localhost:8000/api/v1/videos/:route
 app.use("/api/v1/subscriptions", subscriptionRouter); //makes it http://localhost:8000/api/v1/subscriptions/:route
