@@ -2,13 +2,14 @@ import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux'
 import { login, logout } from './store/authSlice';
 import { setVideos } from './store/videoSlice';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const dispatch=useDispatch();
+  const navigate = useNavigate();
   useEffect(() =>{
     axios.get("/api/v1/users/current-user",{
       withCredentials: true,
@@ -30,16 +31,18 @@ function App() {
       }
       else{
         dispatch(logout());
+        navigate("/login");
       }
     })
     .catch(()=>{
       setError("Failed to fetch user. Please try again."); // Set error message on API failure
       dispatch(logout());
+      navigate("/login");
     })
     .finally(()=>{
       setLoading(false);
     });
-  },[dispatch],[document.cookie]);
+  },[dispatch, navigate],[document.cookie]);
   if(loading) return null;
   if (error) {
     return (
