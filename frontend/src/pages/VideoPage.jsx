@@ -2,7 +2,7 @@ import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import ReactPlayer from 'react-player';
-import { getVideoById } from '../utils/Video.js'; // import the function
+import { getVideoById } from '../utils/Video.js'; //  import the function
 
 const VideoPage = () => {
   const { videoId } = useParams();
