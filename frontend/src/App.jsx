@@ -4,6 +4,7 @@ import { login, logout } from './store/authSlice';
 import { setVideos } from './store/videoSlice';
 import { Outlet, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { Header } from './components';
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -44,18 +45,21 @@ function App() {
     });
   },[dispatch, navigate],[document.cookie]);
   if(loading) return null;
-  if (error) {
-    return (
-      <div className="flex justify-center items-center w-full h-screen bg-black text-white">
-        <div className="error-message">
-          {error}
-        </div> {/* You can style this error message as needed */}
-      </div>
-    );
-  }
+  // if (error) {
+  //   return (
+  //     <div className="flex justify-center items-center w-full h-screen bg-black text-white">
+  //       <div className="error-message">
+  //         {error}
+  //       </div> {/* You can style this error message as needed */}
+  //     </div>
+  //   );
+  // }
   return (
-    <div className="bg-black w-full h-screen text-white">
-      <Outlet />
+    <div className="bg-black w-full text-white">
+      <Header />
+      <main>
+        <Outlet />
+      </main>
     </div>
   )
 }

@@ -7,7 +7,7 @@ const Home = () => {
   const video = useSelector((state) => state.video.videos);
   useEffect(() => {
     setVideos(video);
-  }, [video]);
+  }, [video, videos]);
   console.log(videos.docs);
   return (
     <div className="w-full max-w-7xl mx-auto md:px-5 px-4 py-10 ">
