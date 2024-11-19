@@ -1,19 +1,56 @@
+import { useState } from "react";
 import { RxHamburgerMenu } from "react-icons/rx";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../../store/authSlice.js";
+import { logoutUser } from "../../utils/User.js";
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
     const currentUser = useSelector((state) => state.auth.user);
-    console.log(currentUser.data.avatar);
+    const [menuOpen, setMenuOpen] = useState(false);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    // console.log(currentUser.avatar);
+    const toggleMenu = () => {
+        setMenuOpen((prev) => !prev);
+    };
+    const handleLogout = () => {
+        logoutUser();
+        dispatch(logout());
+        setMenuOpen(false);  // Close the menu after logout
+    };
+    const handleProfileClick = () => {
+        console.log('Navigate to profile page');  // Add navigation to profile page here
+    };
+    const handleLogin = () => {
+        navigate("/login");  // Navigate to the login page
+    };
   return (
     <div className="flex items-center bg-gray-500/30 px-5 pb-4 pt-2 justify-between">
         <div className="flex items-center gap-5">
             <RxHamburgerMenu className="text-2xl"/>
-            <div>Logo</div>
+            <div onClick={()=>navigate("/")} className="cursor-pointer">Logo</div>
         </div>
         <input type="text" placeholder="Search" className="bg-black p-3 px-5 rounded-full w-[40vw] outline-none"/>
-        <div className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center">
-            <img src={currentUser.data.avatar} alt="" />
-        </div>
+        {currentUser ? (
+            <div className="flex items-center gap-5">
+                <div className="w-10 h-10 rounded-full overflow-hidden">
+                    <img src={currentUser.avatar} alt={`${currentUser.username}'s avatar`} onClick={toggleMenu} className="cursor-pointer"/>
+                </div>
+                {/* Dropdown Menu */}
+                {menuOpen && (
+                    <div className="absolute top-12 right-0 bg-white p-2 shadow-md rounded-md">
+                        <button onClick={handleProfileClick} className="block px-4 py-2 text-black w-full text-left">Profile</button>
+                        <button onClick={handleLogout} className="block px-4 py-2 text-black w-full text-left">Logout</button>
+                    </div>
+                )}
+            </div>
+        ) : (
+            <div className="flex gap-5">
+                <button onClick={handleLogin}>Login</button>
+                <button>Sign Up</button>
+            </div>
+        )}
     </div>
   )
 }

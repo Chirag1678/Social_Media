@@ -1,5 +1,15 @@
 import axios from 'axios';
 
+const allVideos = async () => {
+  try {
+    const response = await axios.get('/api/v1/videos');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching video data:', error);
+    throw error;
+  }
+};
+
 const getVideoById = async (videoId) => {
   try {
     const response = await axios.get(`/api/v1/videos/${videoId}`);
@@ -10,4 +20,4 @@ const getVideoById = async (videoId) => {
   }
 };
 
-export { getVideoById };
+export { allVideos, getVideoById };

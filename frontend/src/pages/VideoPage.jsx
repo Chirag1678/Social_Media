@@ -21,12 +21,12 @@ const VideoPage = () => {
         console.error('Failed to load video:', error);
       }
     };
-
     fetchVideo();
   }, [videoId]);
   // console.log(video);
   const owner = video?.video?.owner;
   // console.log(owner);
+//   console.log(comments.docs);
   if (!video) return <div>Loading...</div>;
 
   return (
