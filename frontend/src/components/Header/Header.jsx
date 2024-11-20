@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../store/authSlice.js";
@@ -6,7 +6,11 @@ import { logoutUser } from "../../utils/User.js";
 import { useNavigate } from "react-router-dom";
 
 const Header = () => {
-    const currentUser = useSelector((state) => state.auth.user);
+    const [currentUser, setCurrentUser] = useState(null);
+    const user = useSelector((state) => state.auth.user);
+    useEffect(() => {
+        setCurrentUser(user);
+    }, [user]);
     const [menuOpen, setMenuOpen] = useState(false);
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -20,11 +24,12 @@ const Header = () => {
         setMenuOpen(false);  // Close the menu after logout
     };
     const handleProfileClick = () => {
-        console.log('Navigate to profile page');  // Add navigation to profile page here
+        navigate(`/c/${currentUser.username}`);  // Add navigation to profile page here
     };
     const handleLogin = () => {
         navigate("/login");  // Navigate to the login page
     };
+    // console.log(currentUser);
   return (
     <div className="flex items-center bg-gray-500/30 px-5 pb-4 pt-2 justify-between">
         <div className="flex items-center gap-5">

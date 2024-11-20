@@ -24,6 +24,7 @@ import likeRouter from "./routes/like.routes.js";
 import commentRouter from "./routes/comment.routes.js";
 import dashboardRouter from "./routes/dashboard.routes.js";
 import healthcheckRouter from "./routes/healthcheck.routes.js";
+import { ApiError } from "./utils/apiError.js";
 
 //routes declaration
 app.use("/api/v1/healthcheck", healthcheckRouter); //makes it http://localhost:8000/api/v1/healthcheck/:route
@@ -36,4 +37,24 @@ app.use("/api/v1/likes", likeRouter); //makes it http://localhost:8000/api/v1/li
 app.use("/api/v1/comments", commentRouter); //makes it http://localhost:8000/api/v1/comments/:route
 app.use("/api/v1/dashboard", dashboardRouter); //makes it http://localhost:8000/api/v1/dashboard/:route
 
+app.use((err, req, res, next) => {
+  console.error(err); // Log error for debugging
+  if (err instanceof ApiError) {
+    // If it's a custom API error, use the statusCode from the error
+    return res.status(err.statusCode || 500).json({
+      success: false,
+      message: err.message || "Internal Server Error",
+      errors: err.errors || [], // Optional: Include additional error details
+      stack: process.env.NODE_ENV === "development" ? err.stack : undefined, // Include stack trace in dev environment
+    });
+  }
+
+  // For other unexpected errors, use 500 status code by default
+  return res.status(500).json({
+    success: false,
+    message: err.message || "Something went wrong!",
+    stack: process.env.NODE_ENV === "development" ? err.stack : undefined, // Optional: include stack trace in development
+  });
+});
+  
 export { app };

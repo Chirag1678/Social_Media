@@ -13,9 +13,12 @@ class ApiError extends Error {
         this.errors = errors; // setting the errors
         if(stack){
             this.stack = stack; // setting the stack
-        }else{
-            Error.captureStackTrace(this, this.constructor); // capturing the stack trace
+        }else if (process.env.NODE_ENV === "development") {
+            // Only include stack trace in development mode
+            Error.captureStackTrace(this, this.constructor); // Capture stack trace if not explicitly passed
         }
+        // Adding timestamp for error logging
+        this.timestamp = new Date().toISOString();
     }
 }
 

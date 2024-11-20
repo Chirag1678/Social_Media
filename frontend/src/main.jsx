@@ -10,6 +10,7 @@ import Home from './pages/Home.jsx'
 import Login from './pages/Login.jsx'
 import Signup from './pages/SignUp.jsx'
 import VideoPage from './pages/VideoPage.jsx'
+import Profile from './pages/Profile.jsx'
 
 const router = createBrowserRouter([
   {
@@ -35,6 +36,12 @@ const router = createBrowserRouter([
                 <Signup />
             </AuthLayout>
         ),
+      },
+      {
+        path: "/c/:profile",
+        element: (
+          <Profile />
+        )
       },
       {
         path: "/video/:videoId",

@@ -7,8 +7,8 @@ const Home = () => {
   const video = useSelector((state) => state.video.videos);
   useEffect(() => {
     setVideos(video);
-  }, [video]);
-  console.log(videos.docs);
+  }, [video, videos]);
+  // console.log(videos.docs);
   return (
     <div className="w-full max-w-7xl mx-auto md:px-5 px-4 py-10 min-h-screen">
     {videos.docs && videos.docs.map((video) => (

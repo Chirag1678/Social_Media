@@ -382,6 +382,7 @@ const getUserChannel = asyncHandler(async (req,res) => {
                 isSubscribed: 1, //include the isSubscribed field
                 avatar: 1, //include the avatar field
                 coverImage: 1, //include the coverImage field
+                createdAt: 1 //include the createdAt field
             }
         }
     ])

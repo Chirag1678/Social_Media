@@ -5,7 +5,7 @@ import { useDispatch } from "react-redux"
 import { useForm } from "react-hook-form"
 import { login } from "../store/authSlice"
 import {Button, Input, Logo} from "./index"
-import axios from "axios"
+import { signUpUser } from "../utils/User.js"
 
 const SignUp = () => {
     const navigate=useNavigate();
@@ -14,38 +14,13 @@ const SignUp = () => {
     const [error, setError] = useState("");
 
     const signup=async(data)=>{
-        console.log(data);
-        const formData = new FormData();
-    formData.append('fullName', data.fullName);
-    formData.append('email', data.email);
-    formData.append('username', data.username);
-    formData.append('password', data.password);
-
-    // Append only the first file from FileList, as it should be a single file
-    if (data.avatar.length > 0) {
-        formData.append('avatar', data.avatar[0]);
-    }
-    if (data.coverImage.length > 0) {
-        formData.append('coverImage', data.coverImage[0]);
-    }
-        setError("");
-        axios.post("/api/v1/users/register",formData,{
-            headers:{
-                "Content-Type":"multipart/form-data",
-            },
-        })
-        .then((response)=>{
-            if(response.data){
-                dispatch(login(response.data));
-                navigate("/login");
-            }
-            else{
-                setError("Something went wrong");
-            }
-        })
-        .catch((error)=>{
-            setError(error.response.data.message);
-        });
+        try {
+            const userData = await signUpUser(data);
+            dispatch(login(userData));
+            navigate("/login");
+        } catch (err) {
+            setError(err || "Something went wrong. Please try again.");
+        }
     };
    return (
     <div className="flex items-center justify-center">

@@ -4,7 +4,7 @@ import {login as authLogin} from "../store/authSlice"
 import {Button, Input, Logo} from "./index"
 import { useDispatch } from "react-redux"
 import { useForm } from "react-hook-form"
-import axios from "axios"
+import { loginUser } from "../utils/User.js"
 
 const Login = () => {
     const navigate=useNavigate();
@@ -15,17 +15,14 @@ const Login = () => {
     const login=async(data)=>{
         console.log(data);
         setError("");
-        axios.post("/api/v1/users/login",data)
-        .then((response)=>{
-            if(response.data){
-                dispatch(authLogin(response.data.user));
-                navigate("/");
-            }
-        })
-        .catch((error)=>{
+        try {
+            const response = await loginUser(data.email, data.password); // Using loginUser from user.js
+            dispatch(authLogin(response.user));
+            navigate("/");
+        } catch (error) {
             const errorMessage = error?.response?.data?.message || "An error occurred during login";
             setError(errorMessage);
-        });
+        }
     }
   return (
     <div className="flex items-center justify-center w-full min-h-screen">

@@ -9,6 +9,7 @@ import { allVideos } from './utils/Video.js';
 
 function App() {
   const [error, setError] = useState(null);
+  const [cookies, setCookies] = useState(null);
   const dispatch=useDispatch();
   const navigate = useNavigate();
   useEffect(() =>{
@@ -56,7 +57,11 @@ function App() {
       }
     }
     fetchUser();
-  },[dispatch, navigate]);
+  },[dispatch, navigate, cookies]);
+  useEffect(() =>{
+    const cookie = document.cookie;
+    setCookies(cookie);
+  },[]);
   // if(loading) return null;
   return (
     <div className="bg-black w-full text-white">
