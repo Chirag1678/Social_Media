@@ -90,7 +90,7 @@ const Profile = () => {
       </div>}
       <div className="text-center">
       <button
-        className="bg-white text-black cursor-pointer py-2 px-4 rounded-full font-medium"
+        className="bg-white text-black cursor-pointer py-2 px-4 rounded-full font-medium "
         onClick={openModal}
       >
       Upload Videos
