@@ -6,7 +6,7 @@ import { createVideo } from "../../utils/Video.js";
 import {Button, Input, TextArea} from "../index"
 
 const Home = ({profile}) => {
-//   console.log(profile);
+  console.log(profile);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { register, handleSubmit, formState: { errors, isSubmitted }  } = useForm();
   const [filteredvideos, setFilteredVideos] = useState([]);
