@@ -14,4 +14,14 @@ const createPlaylist = async (title,description) => {
     }
 }
 
-export { createPlaylist };
+const getUserPlaylists = async (userId) => {
+    try {
+        const response = await axios.get(`/api/v1/playlist/user/${userId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching playlist data:', error);
+        throw error;
+    }
+}
+
+export { createPlaylist, getUserPlaylists };

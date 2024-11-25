@@ -1,15 +1,23 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { Button, Input, TextArea } from "../index";
+import { Button, Input, PlaylistCard, TextArea } from "../index";
 import { createPlaylist } from "../../utils/Playlist";
+import { useSelector } from "react-redux";
 
 const Playlists = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { register, handleSubmit, formState: { errors, isSubmitted } } = useForm();
+  const [playlists, setPlaylists] = useState([]);
 
   const openModal = () => setIsModalOpen(true); // Open modal
   const closeModal = () => setIsModalOpen(false); // Close modal
 
+  const playlist = useSelector((state) => state.playlist.playlists);
+  useEffect(() => {
+    if (playlist) {
+        setPlaylists(playlist.playlists); // Update state only when `playlist` changes
+    }
+  }, [playlist]);
   const playlistCreation = async (data) => {
     // Placeholder for playlist creation logic (API call or state update)
     try {
@@ -27,12 +35,17 @@ const Playlists = () => {
 
   return (
     <div>
-      <div className="flex items-center justify-center mt-20 mb-5">
+      {!playlists && <div className="flex items-center justify-center mt-20 mb-5">
         <div className="text-center">
           <div className="h-40 w-40 rounded-full bg-green-500 mx-auto mb-4"></div>
           <p>Create your playlist, then add existing content or upload new videos.</p>
         </div>
-      </div>
+      </div>}
+      {playlists && <div>
+        {playlists.map((playlist) => (
+            <PlaylistCard key={playlist._id} playlist={playlist}/>
+        ))}
+      </div>}
       <div className="text-center">
         <button
           className="bg-white text-black cursor-pointer py-2 px-4 rounded-full font-medium"

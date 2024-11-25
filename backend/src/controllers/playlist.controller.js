@@ -79,7 +79,9 @@ const getUserPlaylists = asyncHandler(async (req, res) => {
             $project: {
                 name: 1,
                 description: 1,
-                videos: 1
+                videos: 1,
+                owner: 1,
+                updatedAt: 1
             }
         }
     ]);

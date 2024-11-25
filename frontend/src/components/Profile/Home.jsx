@@ -5,21 +5,17 @@ import { VideoCard } from "../index.js";
 import { createVideo } from "../../utils/Video.js";
 import {Button, Input, TextArea} from "../index"
 
-const Home = ({profile}) => {
-  console.log(profile);
+const Home = () => {
+//   console.log(profile);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { register, handleSubmit, formState: { errors, isSubmitted }  } = useForm();
   const [filteredvideos, setFilteredVideos] = useState([]);
   const video = useSelector((state) => state.video.videos);
-//   console.log(video);
   useEffect(() => {
-    if (video.docs) {
-        const userVideos = video.docs.filter(
-            (vid) => vid.owner?.[0].username === profile
-        );
-        setFilteredVideos(userVideos);
+    if (video) {
+      setFilteredVideos(video); // Update state only when `video` changes
     }
-  },[video, profile]);
+  }, [video]);
 //   console.log(filteredvideos);
   const videoCreation = async (data) => {
     // console.log(data);

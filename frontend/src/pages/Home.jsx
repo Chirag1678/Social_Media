@@ -1,13 +1,25 @@
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 import VideoCard from "../components/Video/VideoCard";
+import { allVideos } from "../utils/Video";
+
 
 const Home = () => {
   const [videos, setVideos] = useState([]);
-  const video = useSelector((state) => state.video.videos);
+  // const video = useSelector((state) => state.video.videos);
   useEffect(() => {
-    setVideos(video);
-  }, [video, videos]);
+    const getAllVideos = async () => {
+      try{
+        const response = await allVideos();
+        // console.log(response.data);
+        setVideos(response.data);
+      }
+      catch(error){
+        console.error('Error fetching video data:', error);
+        throw error;
+      }
+    }
+    getAllVideos();
+  }, []);
   // console.log(videos.docs);
   return (
     <div className="w-full max-w-7xl mx-auto md:px-5 px-4 py-10 min-h-screen flex flex-wrap gap-16">

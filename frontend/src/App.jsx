@@ -1,11 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux'
 import { login, logout } from './store/authSlice';
-import { setVideos } from './store/videoSlice';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { Header } from './components';
 import { currentUser } from './utils/User.js';
-import { allVideos } from './utils/Video.js';
 
 function App() {
   const [error, setError] = useState(null);
@@ -44,9 +42,7 @@ function App() {
     const fetchUser = async () => {
       try {
         const user = await currentUser();
-        const videos = await allVideos();
         dispatch(login(user.data));
-        dispatch(setVideos(videos.data));
       } catch (error) {
         if (error.response?.status === 401 || error.response?.data?.message === "User is not logged in") {
           // If user is not logged in, navigate to home or login page

@@ -6,22 +6,39 @@ import { format } from "date-fns";
 // import { createVideo } from "../utils/Video.js";
 // import { useSelector } from "react-redux";
 import { ProfileHome, ProfilePlaylists, ProfileTweets } from "../components/index.js";
+import { allVideos } from "../utils/Video.js";
+import { useDispatch } from "react-redux";
+import { setVideos } from "../store/videoSlice.js";
+import { getUserPlaylists } from "../utils/Playlist.js";
+import { setPlaylists } from "../store/playlistSlice.js";
+import { getUserTweets } from "../utils/Tweet.js";
+import { setTweets } from "../store/tweetSlice.js";
 
 const Profile = () => {
   const { profile } = useParams();
   const [channel, setChannel] = useState(null);
   const [activeTab, setActiveTab] = useState("home");
+  const dispatch = useDispatch();
   useEffect(() => {
     const fetchChannel = async () => {
       try {
         const channelData = await getUserChannel(profile);
         setChannel(channelData.data);
+        const videos = await allVideos();
+        const filteredVideos = videos.data.docs.filter((video) => video.owner[0].username === profile);
+        dispatch(setVideos(filteredVideos));
+        const playlists = await getUserPlaylists(channelData.data._id);
+        dispatch(setPlaylists(playlists.data));
+        const tweets = await getUserTweets(channelData.data._id);
+        dispatch(setTweets(tweets.data));
       } catch (error) {
         console.error("Failed to load channel:", error);
       }
     };
     fetchChannel();
-  }, [profile]);
+  }, [profile, dispatch]);
+  // console.log(channel?._id);
+  // const id=channel?._id;
   if (!channel) {
     return <div>Loading...</div>; // Loading state while waiting for channel data
   }
@@ -29,7 +46,7 @@ const Profile = () => {
   const renderContent = () => {
     switch (activeTab) {
       case "home":
-        return <ProfileHome profile={profile} />;
+        return <ProfileHome/>;
       case "playlists":
         return <ProfilePlaylists/>;
       case "tweets":
