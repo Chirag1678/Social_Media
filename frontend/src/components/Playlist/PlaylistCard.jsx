@@ -1,6 +1,11 @@
 import { formatDistanceToNow } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
 const PlaylistCard = ({playlist}) => {
-    console.log(playlist);
+    const navigate = useNavigate();
+    // console.log(playlist);
+    const handlePlaylistClick = () => {
+        navigate(`/playlist/${playlist._id}`);
+      }
   return (
     <div className="w-[18%] h-[30vh]">
         <div className="w-full h-[62%] bg-white rounded-lg overflow-hidden flex items-center justify-center">
@@ -9,7 +14,7 @@ const PlaylistCard = ({playlist}) => {
         </div>
         <h1 className="font-semibold capitalize">{playlist.name}</h1>
         <p>updated {playlist.updatedAt ? formatDistanceToNow(new Date(playlist.updatedAt), { addSuffix: true }) : 'Unknown'}</p>
-        <button>view full playlist</button>
+        <button onClick={handlePlaylistClick}>view full playlist</button>
     </div>
   )
 }

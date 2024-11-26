@@ -11,6 +11,7 @@ import Login from './pages/Login.jsx'
 import Signup from './pages/SignUp.jsx'
 import VideoPage from './pages/VideoPage.jsx'
 import Profile from './pages/Profile.jsx'
+import PlaylistPage from './pages/PlaylistPage.jsx'
 
 const router = createBrowserRouter([
   {
@@ -47,6 +48,12 @@ const router = createBrowserRouter([
         path: "/video/:videoId",
         element: (
           <VideoPage />        
+        )
+      },
+      {
+        path: "/playlist/:playlistId",
+        element: (
+          <PlaylistPage />
         )
       }
     ]

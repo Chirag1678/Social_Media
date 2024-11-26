@@ -32,7 +32,7 @@ const VideoPage = () => {
   return (
     <div className="video-page px-4 py-10 min-h-screen bg-black">
       <div>
-      <ReactPlayer url={video.video.videoFile} height="70vh" width="75vw" controls />
+      <ReactPlayer url={video.video.videoFile} height="70vh" width="75vw" controls playing/>
       <h1 className='mb-2 capitalize'>{video.video.title}</h1>
       <div className='flex gap-3'>
         <div className='w-10 h-10 rounded-full overflow-hidden'>

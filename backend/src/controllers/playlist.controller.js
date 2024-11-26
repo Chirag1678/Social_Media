@@ -100,7 +100,60 @@ const getPlaylistById = asyncHandler(async (req, res) => {
     }
 
     // get playlist by id
-    const playlist = await Playlist.findById(playlistId).populate("videos", "title description");
+    // const playlist = await Playlist.findById(playlistId).populate("videos", "title description");
+    const playlist = await Playlist.aggregate([
+        {
+            $match: {
+                _id: new mongoose.Types.ObjectId(playlistId)
+            }
+        },
+        {
+            $lookup: {
+                from: "videos",
+                localField: "videos",
+                foreignField: "_id",
+                as: "videos",
+                pipeline: [
+                    {
+                        $project: {
+                            title: 1,
+                            description: 1,
+                            videoFile: 1,
+                            thumbnail: 1,
+                            views: 1
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "owner",
+                foreignField: "_id",
+                as: "owner",
+                pipeline: [
+                    {
+                        $project: {
+                            fullName: 1,
+                            username: 1,
+                            avatar: 1
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            $project: {
+                name: 1,
+                description: 1,
+                videos: 1,
+                owner: 1,
+                updatedAt: 1,
+                public: 1
+            }
+        }
+    ]);
 
     //check if playlist is found
     if(!playlist){

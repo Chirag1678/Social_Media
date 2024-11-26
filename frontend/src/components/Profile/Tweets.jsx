@@ -4,8 +4,8 @@ import { Button, Input, TextArea } from "../index";
 import { createTweet } from "../../utils/Tweet";
 import { useSelector } from "react-redux";
 const Tweets = () => {
-    const [isModalOpen, setIsModalOpen] = useState(false);
-  const { register, handleSubmit, formState: { errors, isSubmitted } } = useForm();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { register, handleSubmit, formState: { errors, isSubmitted }} = useForm();
   const [tweets, setTweets] = useState([]);
 
   const openModal = () => setIsModalOpen(true); // Open modal
@@ -21,7 +21,8 @@ const Tweets = () => {
   const tweetCreation = async (data) => {
     // Placeholder for tweet creation logic (API call or state update)
     try {
-        const response = await createTweet(data.content);
+        const response = await createTweet(data);
+        // console.log(data);
         console.log("Tweet created successfully:", response);
         alert("Tweet created successfully!");
         closeModal();
@@ -35,12 +36,20 @@ const Tweets = () => {
 
   return (
     <div>
-      {tweets && <div className="flex items-center justify-center mt-20 mb-5">
+      {tweets.length===0 && <div className="flex items-center justify-center mt-20 mb-5">
         <div className="text-center">
           <div className="h-40 w-40 rounded-full bg-green-500 mx-auto mb-4"></div>
           <p>Create your playlist, then add existing content or upload new videos.</p>
         </div>
       </div>}
+      {tweets.length>0 && <div>
+        {tweets.map((tweet) => (
+            <div key={tweet._id}>
+                <h2>{tweet.content}</h2>
+            </div>
+        ))}
+      </div>}
+      <div>
       <div className="text-center">
         <button
           className="bg-white text-black cursor-pointer py-2 px-4 rounded-full font-medium"
@@ -48,6 +57,7 @@ const Tweets = () => {
         >
           New Playlist
         </button>
+      </div>
         {/* Modal for Playlist Creation */}
         {isModalOpen && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -55,13 +65,25 @@ const Tweets = () => {
                     <h2 className="text-xl font-semibold py-4 px-6">Create a new Tweet</h2>
                     <hr />
                     <h2 className="font-medium text-2xl mt-3 px-6">Details</h2>
-                    <div className="px-6"></div>
-                    <form action="" method="post">
-                        <div className="flex justify-end gap-3 mt-2">
-                            <Button bgColor="bg-gray-300" onClick={closeModal}>Cancel</Button>
-                            <Button type="submit" bgColor="bg-blue-500">Create Playlist</Button>
-                        </div>
-                    </form>
+                    <div className="px-6">
+                      <form onSubmit={handleSubmit(tweetCreation)} className="text-black">
+                          {/* Common Error Message */}
+                          {isError && (
+                            <p className="text-red-500 text-sm font-bold">
+                              Required fields are missing. Please fill out all fields.
+                            </p>
+                          )}
+                          <Input label="Content: " placeholder="Enter your tweet" type="text" name="content" {...register("content",{
+                              required:true,
+                          })}/>
+                          {errors.content && <p className="text-red-500 text-sm font-bold">Content is required</p>}
+                          <Input label="Image: " placeholder="Enter your image" type="file" name="image" {...register("image")}/>
+                          <div className="flex justify-end gap-3 mt-2">
+                              <Button bgColor="bg-gray-300" onClick={closeModal}>Cancel</Button>
+                              <Button type="submit" bgColor="bg-blue-500">Create Playlist</Button>
+                          </div>
+                      </form>
+                    </div>
                  </div>
             </div>
         )}

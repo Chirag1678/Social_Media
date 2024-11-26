@@ -8,6 +8,10 @@ function VideoCard({ video }) {
   const navigate = useNavigate();
   const handleCardClick = () => {
     navigate(`/video/${video._id}`);
+  };
+  const profileClick = (event) => {
+    event.stopPropagation();
+    navigate(`/c/${video.owner[0].username}`);
   }
   const [isPlaying, setIsPlaying] = useState(false);
   const channel = video.owner[0];
@@ -25,13 +29,12 @@ function VideoCard({ video }) {
         />
       </div>
       <div className="flex mt-4 gap-3">
-        <div className="w-10 h-10 rounded-full bg-black overflow-hidden">
+        <div className="w-10 h-10 rounded-full bg-black overflow-hidden cursor-pointer" onClick={profileClick}>
         <img src={channel.avatar} alt={`${channel.username}'s avatar`} />
-
         </div>
         <div className="leading-5">
             <h1 className="uppercase font-semibold pb-1">{video.title}</h1>
-            <h2 className="capitalize">{channel.username}</h2>
+            <span className="capitalize cursor-pointer hover:text-gray-500" onClick={profileClick}>{channel.username}</span>
             <div>
                 <span>{video.views} views </span>
                 <span>Uploaded {video.createdAt ? formatDistanceToNow(new Date(video.createdAt), { addSuffix: true }) : 'Unknown'}</span>
