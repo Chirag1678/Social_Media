@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import VideoCard from "../components/Video/VideoCard";
 import { allVideos } from "../utils/Video";
 
-
 const Home = () => {
   const [videos, setVideos] = useState([]);
   // const video = useSelector((state) => state.video.videos);

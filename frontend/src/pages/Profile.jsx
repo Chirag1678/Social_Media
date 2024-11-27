@@ -7,7 +7,7 @@ import { format } from "date-fns";
 // import { useSelector } from "react-redux";
 import { ProfileHome, ProfilePlaylists, ProfileTweets } from "../components/index.js";
 import { allVideos } from "../utils/Video.js";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setVideos } from "../store/videoSlice.js";
 import { getUserPlaylists } from "../utils/Playlist.js";
 import { setPlaylists } from "../store/playlistSlice.js";
@@ -16,8 +16,17 @@ import { setTweets } from "../store/tweetSlice.js";
 
 const Profile = () => {
   const { profile } = useParams();
+  const loggedInUser = useSelector((state) => state.auth.user);
+  let userChannel = false;
+  if (loggedInUser) {
+    if (loggedInUser.data.username === profile) {
+      userChannel = true;
+    }
+  }
+  // console.log(userChannel);
   const [channel, setChannel] = useState(null);
   const [activeTab, setActiveTab] = useState("home");
+  const [filteredVideos, setFilteredVideos] = useState(0);
   const dispatch = useDispatch();
   useEffect(() => {
     const fetchChannel = async () => {
@@ -26,6 +35,7 @@ const Profile = () => {
         setChannel(channelData.data);
         const videos = await allVideos();
         const filteredVideos = videos.data.docs.filter((video) => video.owner[0].username === profile);
+        setFilteredVideos(filteredVideos.length);
         dispatch(setVideos(filteredVideos));
         const playlists = await getUserPlaylists(channelData.data._id);
         dispatch(setPlaylists(playlists.data));
@@ -37,7 +47,7 @@ const Profile = () => {
     };
     fetchChannel();
   }, [profile, dispatch]);
-  // console.log(channel?._id);
+  console.log(channel);
   // const id=channel?._id;
   if (!channel) {
     return <div>Loading...</div>; // Loading state while waiting for channel data
@@ -63,12 +73,16 @@ const Profile = () => {
         </div>
         <div>
           <p>{channel.fullName}</p>
-          <p>@{channel.username}</p>
+          <div className="flex items-center gap-2">
+            <p>@{channel.username} </p>
+            {!userChannel && <><p>. {channel.subscriberCount} subscribers</p>
+            <p>. {filteredVideos} videos</p></>}
+          </div>
           <p>Joined {formattedDate}</p>
-          <div className="flex items-center gap-3">
+          {userChannel && <div className="flex items-center gap-3">
             <button>Customize channel</button>
             <button>Manage videos</button>
-          </div>
+          </div>}
         </div>
       </div>
       <div className="mt-3 flex items-center gap-4 border-b-[0.05rem]">

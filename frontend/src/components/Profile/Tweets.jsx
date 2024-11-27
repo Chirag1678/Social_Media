@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { Button, Input, TextArea } from "../index";
+import { Button, Input, TweetCard } from "../index";
 import { createTweet } from "../../utils/Tweet";
 import { useSelector } from "react-redux";
 const Tweets = () => {
@@ -17,7 +17,7 @@ const Tweets = () => {
         setTweets(tweet.tweets); // Update state only when `tweet` changes
       }
   }, [tweet]);
-  console.log(tweets);
+//   console.log(tweets);
   const tweetCreation = async (data) => {
     // Placeholder for tweet creation logic (API call or state update)
     try {
@@ -39,14 +39,15 @@ const Tweets = () => {
       {tweets.length===0 && <div className="flex items-center justify-center mt-20 mb-5">
         <div className="text-center">
           <div className="h-40 w-40 rounded-full bg-green-500 mx-auto mb-4"></div>
-          <p>Create your playlist, then add existing content or upload new videos.</p>
+          <p>Create new Tweet, for you audience to connect.</p>
         </div>
       </div>}
-      {tweets.length>0 && <div>
+      {tweets.length>0 && <div className="px-2">
         {tweets.map((tweet) => (
-            <div key={tweet._id}>
-                <h2>{tweet.content}</h2>
-            </div>
+            // <div key={tweet._id}>
+            //     <h2>{tweet.content}</h2>
+            // </div>
+            <TweetCard key={tweet._id} tweet={tweet}/>
         ))}
       </div>}
       <div>
@@ -55,7 +56,7 @@ const Tweets = () => {
           className="bg-white text-black cursor-pointer py-2 px-4 rounded-full font-medium"
           onClick={openModal}
         >
-          New Playlist
+          New Tweet
         </button>
       </div>
         {/* Modal for Playlist Creation */}
@@ -80,7 +81,7 @@ const Tweets = () => {
                           <Input label="Image: " placeholder="Enter your image" type="file" name="image" {...register("image")}/>
                           <div className="flex justify-end gap-3 mt-2">
                               <Button bgColor="bg-gray-300" onClick={closeModal}>Cancel</Button>
-                              <Button type="submit" bgColor="bg-blue-500">Create Playlist</Button>
+                              <Button type="submit" bgColor="bg-blue-500">Create Tweet</Button>
                           </div>
                       </form>
                     </div>

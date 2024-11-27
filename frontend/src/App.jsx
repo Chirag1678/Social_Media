@@ -7,7 +7,6 @@ import { currentUser } from './utils/User.js';
 
 function App() {
   const [error, setError] = useState(null);
-  const [cookies, setCookies] = useState(null);
   const dispatch=useDispatch();
   const navigate = useNavigate();
   useEffect(() =>{
@@ -42,7 +41,9 @@ function App() {
     const fetchUser = async () => {
       try {
         const user = await currentUser();
-        dispatch(login(user.data));
+        if (user) {
+          dispatch(login(user));
+        }
       } catch (error) {
         if (error.response?.status === 401 || error.response?.data?.message === "User is not logged in") {
           // If user is not logged in, navigate to home or login page
@@ -53,11 +54,7 @@ function App() {
       }
     }
     fetchUser();
-  },[dispatch, navigate, cookies]);
-  useEffect(() =>{
-    const cookie = document.cookie;
-    setCookies(cookie);
-  },[]);
+  },[dispatch, navigate]);
   // if(loading) return null;
   return (
     <div className="bg-black w-full text-white">

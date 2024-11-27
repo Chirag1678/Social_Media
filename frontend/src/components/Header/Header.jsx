@@ -9,7 +9,9 @@ const Header = () => {
     const [currentUser, setCurrentUser] = useState(null);
     const user = useSelector((state) => state.auth.user);
     useEffect(() => {
-        setCurrentUser(user);
+        if(user) {
+            setCurrentUser(user.data);
+        }
     }, [user]);
     const [menuOpen, setMenuOpen] = useState(false);
     const dispatch = useDispatch();

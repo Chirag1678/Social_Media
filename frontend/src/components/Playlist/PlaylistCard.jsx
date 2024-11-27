@@ -5,7 +5,7 @@ const PlaylistCard = ({playlist}) => {
     // console.log(playlist);
     const handlePlaylistClick = () => {
         navigate(`/playlist/${playlist._id}`);
-      }
+    }
   return (
     <div className="w-[18%] h-[30vh]">
         <div className="w-full h-[62%] bg-white rounded-lg overflow-hidden flex items-center justify-center">
