@@ -165,4 +165,76 @@ const getLikedVideos = asyncHandler(async (req, res) => {
     res.status(200).json(new ApiResponse(200, likedVideos, "Liked videos fetched successfully"));
 })
 
-export { toggleCommentLike, toggleTweetLike, toggleVideoLike, getLikedVideos };
+const isLikedVideo = asyncHandler(async (req, res) => {
+    //get videoId from req.params
+    const {videoId} = req.params;
+
+    //get userId from req.user
+    const userId = req.user._id;
+
+    //check if videoId is valid
+    if(!isValidObjectId(videoId)){
+        throw new ApiError(400, "Invalid video id");
+    }
+
+    //check if userId is valid
+    if(!isValidObjectId(userId)){
+        throw new ApiError(400, "Invalid user id");
+    }
+
+    //check if user has liked the video
+    const like = await Like.findOne({video: videoId, likedBy: userId});
+
+    //return success response
+    res.status(200).json(new ApiResponse(200, {isLiked: like ? true : false}, "Video like status fetched successfully"));
+})
+
+const isLikedComment = asyncHandler(async (req, res) => {
+    //get commentId from req.params
+    const {commentId} = req.params;
+
+    //get userId from req.user
+    const userId = req.user._id;
+
+    //check if commentId is valid
+    if(!isValidObjectId(commentId)){
+        throw new ApiError(400, "Invalid comment id");
+    }
+
+    //check if userId is valid
+    if(!isValidObjectId(userId)){
+        throw new ApiError(400, "Invalid user id");
+    }
+
+    //check if user has liked the comment
+    const like = await Like.findOne({comment: commentId, likedBy: userId});
+
+    //return success response
+    res.status(200).json(new ApiResponse(200, {isLiked: like ? true : false}, "Comment like status fetched successfully"));
+})
+
+const isLikedTweet = asyncHandler(async (req, res) => {
+    //get tweetId from req.params
+    const {tweetId} = req.params;
+
+    //get userId from req.user
+    const userId = req.user._id;
+
+    //check if tweetId is valid
+    if(!isValidObjectId(tweetId)){
+        throw new ApiError(400, "Invalid tweet id");
+    }
+
+    //check if userId is valid
+    if(!isValidObjectId(userId)){
+        throw new ApiError(400, "Invalid user id");
+    }
+
+    //check if user has liked the tweet
+    const like = await Like.findOne({tweet: tweetId, likedBy: userId});
+
+    //return success response
+    res.status(200).json(new ApiResponse(200, {isLiked: like ? true : false}, "Tweet like status fetched successfully"));
+})
+
+export { toggleCommentLike, toggleTweetLike, toggleVideoLike, getLikedVideos, isLikedVideo, isLikedComment, isLikedTweet };

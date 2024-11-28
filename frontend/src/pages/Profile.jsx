@@ -5,7 +5,7 @@ import { format } from "date-fns";
 // import { useForm } from "react-hook-form";
 // import { createVideo } from "../utils/Video.js";
 // import { useSelector } from "react-redux";
-import { ProfileHome, ProfilePlaylists, ProfileTweets } from "../components/index.js";
+import { Button, ProfileHome, ProfilePlaylists, ProfileTweets } from "../components/index.js";
 import { allVideos } from "../utils/Video.js";
 import { useDispatch, useSelector } from "react-redux";
 import { setVideos } from "../store/videoSlice.js";
@@ -13,6 +13,7 @@ import { getUserPlaylists } from "../utils/Playlist.js";
 import { setPlaylists } from "../store/playlistSlice.js";
 import { getUserTweets } from "../utils/Tweet.js";
 import { setTweets } from "../store/tweetSlice.js";
+import { toggleSubscribtion } from "../utils/Subscription.js";
 
 const Profile = () => {
   const { profile } = useParams();
@@ -47,7 +48,25 @@ const Profile = () => {
     };
     fetchChannel();
   }, [profile, dispatch]);
-  console.log(channel);
+  // console.log(channel);
+  const toggleSubscribe = async () => {
+    try {
+      const response = await toggleSubscribtion(channel._id); // Call the subscription API
+      console.log(response);
+      setChannel((prevChannel) => ({
+        ...prevChannel,
+        isSubscribed: !prevChannel.isSubscribed, // Toggle the subscription status
+      }));
+      alert(
+        !channel.isSubscribed
+          ? "Subscribed to channel!"
+          : "Unsubscribed from channel!"
+      );
+    } catch (error) {
+      console.error("Failed to toggle subscription:", error);
+      alert("Failed to toggle subscription. Please try again.");
+    }
+  }
   // const id=channel?._id;
   if (!channel) {
     return <div>Loading...</div>; // Loading state while waiting for channel data
@@ -82,6 +101,10 @@ const Profile = () => {
           {userChannel && <div className="flex items-center gap-3">
             <button>Customize channel</button>
             <button>Manage videos</button>
+          </div>}
+          {!userChannel && <div>
+            {!channel.isSubscribed && <Button bgColor="bg-white" className="mt-3 font-semibold" textColor="text-black" onClick={toggleSubscribe}>Subscribe</Button>}
+            {channel.isSubscribed && <Button bgColor="bg-gray-500" className="mt-3 font-semibold" textColor="text-white" onClick={toggleSubscribe}>Subscribed</Button>}
           </div>}
         </div>
       </div>

@@ -2,6 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/apiError.js";
 import { User } from "../models/user.model.js";
 import { Video } from "../models/video.model.js";
+import { Like } from "../models/like.model.js";
 import { uploadOnCloudinary, deleteFromCloudinary } from "../utils/cloudinary.js";
 import mongoose, { isValidObjectId } from "mongoose";
 import { ApiResponse } from "../utils/ApiResponse.js"; 
@@ -108,20 +109,75 @@ const getVideoById = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Invalid video id"); //return error if videoId is invalid
     }
 
-    //find video by id
-    const video = await Video.findById(videoId).populate("owner", "username email avatar");
+    // Increment views
+    await Video.findByIdAndUpdate(
+        videoId,
+        { $inc: { views: 1 } },
+        { new: true }
+    );
 
-    //check if video is found
-    if(!video){
-        throw new ApiError(404, "Video not found")
+    //find video by id
+    const [video] = await Video.aggregate([
+        {
+            $match: {
+                _id: new mongoose.Types.ObjectId(videoId),
+            },
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "owner",
+                foreignField: "_id",
+                as: "owner",
+                pipeline: [
+                    {
+                        $project: {
+                            username: 1,
+                            email: 1,
+                            avatar: 1,
+                        },
+                    },
+                ],
+            },
+        },
+        {
+            $lookup: {
+                from: "likes",
+                localField: "_id",
+                foreignField: "video",
+                as: "likes",
+                pipeline: [
+                    {
+                        $count: "likes",
+                    },
+                ],
+            },
+        },
+        {
+            $unwind: "$owner",
+        },
+        {
+            $addFields: {
+                likes: { $ifNull: [{ $arrayElemAt: ["$likes.likes", 0] }, 0] }, // Handle case with no likes
+            },
+        },
+        {
+            $limit: 1,
+        },
+    ]);
+
+    // Check if video is found
+    if (!video) {
+        throw new ApiError(404, "Video not found");
     }
 
-    //if video is found, increment views and add it to user watch history
-    video.views += 1;
-    await video.save();
+    // Get the user and update the watch history only if videoId is not present
     const user = await User.findById(req.user._id);
-    user.watchHistory.push(video._id);
-    await user.save();
+
+    if (!user.watchHistory.includes(videoId)) {
+        user.watchHistory.push(videoId);
+        await user.save();
+    }
 
     //return success response
     res.status(200).json(new ApiResponse(200, {video,user}, "Video found"))
