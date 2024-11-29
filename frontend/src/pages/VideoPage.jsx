@@ -10,6 +10,7 @@ import { BiDislike } from "react-icons/bi";
 import { BiSolidLike } from "react-icons/bi";
 import { BiSolidDislike } from "react-icons/bi";
 import { isLikedVideo, toggleVideoLike } from '../utils/Like.js';
+import { CommentCard } from '../components/index.js';
 
 const VideoPage = () => {
   const { videoId } = useParams();
@@ -26,6 +27,9 @@ const VideoPage = () => {
         const commentsData = await getCommentsById(videoId);
         setVideo(videoData.data);
         setComments(commentsData.data);
+        commentsData.data.docs.map((comment) => {
+          console.log(comment.owner.avatar);
+        });
         setLikes(videoData.data.video.likes);
         const owner = videoData.data?.video?.owner;
         if (owner){
@@ -106,7 +110,7 @@ const VideoPage = () => {
   return (
     <div className="video-page px-4 py-10 min-h-screen bg-black">
       <div>
-      <ReactPlayer url={video.video.videoFile} height="70vh" width="75vw" controls playing/>
+      <ReactPlayer url={video.video.videoFile} height="70vh" width="75vw" controls playing muted/>
       <h1 className='mb-2 capitalize'>{video.video.title}</h1>
       <div className='flex justify-between w-[75vw] pr-3'>
         <div className='flex items-center gap-3'>
@@ -149,20 +153,7 @@ const VideoPage = () => {
             </div>
         </form>
         {comments.docs.map((comment)=>(
-            <div key={comment._id} className='flex gap-4 mt-5'>
-                <div className='w-10 h-10 rounded-full overflow-hidden'>
-                    <img src={comment.owner?.[0].avatar} alt="" />
-                </div>
-                <div>
-                    <div className='flex items-center gap-2'><span className='capitalize'>{comment.owner?.[0].username}</span>
-                    <span>{comment.createdAt ? formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true }) : 'Unknown'}</span></div>
-                    <p>{comment.content}</p>
-                    <div className='flex items-center gap-3'>
-                      <button className='flex items-center gap-2'><BiLike className='text-xl'/> 0</button>
-                      <button><BiDislike className='text-xl' /></button>
-                    </div>
-                </div>
-            </div>
+            <CommentCard key={comment._id} comment={comment}/>
         ))}
       </div>
     </div>
