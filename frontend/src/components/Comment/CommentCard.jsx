@@ -2,11 +2,19 @@ import { formatDistanceToNow } from 'date-fns';
 import { useEffect, useState } from 'react';
 import { BiDislike, BiLike, BiSolidLike, BiSolidDislike } from 'react-icons/bi';
 import { isLikedComment, toggleCommentLike } from '../../utils/Like';
-const CommentCard = ({comment}) => {
+import { BsThreeDotsVertical } from 'react-icons/bs';
+import { useSelector } from 'react-redux';
+import { deleteComment } from '../../utils/Comment';
+const CommentCard = ({ comment, deleteCommentHandler }) => {
 //   console.log(comment);
   const [likes, setLikes] = useState(comment.likes);
   const [liked, setLiked] = useState(false);
   const [disliked, setDisliked] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const currentUser = useSelector((state) => state.auth.user);
+  const deletion = currentUser && currentUser.data.username === comment.owner?.username;
+//   console.log(deletion);
+//   console.log(currentUser);
   useEffect(()=>{
     const liked = async () => {
         try {
@@ -74,21 +82,46 @@ const CommentCard = ({comment}) => {
         console.error('Error disliking comment:', error);
     }
   }
+
+  // Function to delete comment
+  const deletingComment = async () => {
+    try {
+      await deleteComment(comment._id); // Make API call to delete comment
+      deleteCommentHandler(comment._id); // Notify parent to update the comments
+      alert("Comment deleted successfully!");
+    } catch (error) {
+      console.error('Failed to delete comment:', error);
+      alert("Failed to delete comment. Please try again.");
+    }
+  };
+  const toggleModal = () => setIsModalOpen(!isModalOpen);
   return (
-    <div key={comment._id} className='flex gap-4 mt-5'>
-        <div className='w-10 h-10 rounded-full overflow-hidden'>
-            <img src={comment.owner?.avatar} alt={comment.owner?.avatar} />
+    <div className='flex items-start justify-between mt-5'>
+        <div key={comment._id} className='flex gap-4'>
+            <div className='w-10 h-10 rounded-full overflow-hidden'>
+                <img src={comment.owner?.avatar} alt={comment.owner?.avatar} />
+            </div>
+            <div>
+                <div className='flex items-center gap-2'>
+                    <span className='capitalize'>{comment.owner?.username}</span>
+                    <span>{comment.createdAt ? formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true }) : 'Unknown'}</span>
+                </div>
+                <p>{comment.content}</p>
+                <div className='flex items-center'>
+                    <button className='pr-5 border-r-white flex items-center gap-2' onClick={toggleLike}>{!liked?<BiLike className='text-2xl'/>:<BiSolidLike className='text-2xl'/>}{likes}</button>
+                    <button className='' onClick={toggleDislike}>{!disliked?<BiDislike className='text-2xl'/>:<BiSolidDislike className='text-2xl'/>}</button>
+                </div>
+            </div>
         </div>
-        <div>
-            <div className='flex items-center gap-2'>
-                <span className='capitalize'>{comment.owner?.username}</span>
-                <span>{comment.createdAt ? formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true }) : 'Unknown'}</span>
-            </div>
-            <p>{comment.content}</p>
-            <div className='flex items-center'>
-                <button className='pr-5 border-r-white flex items-center gap-2' onClick={toggleLike}>{!liked?<BiLike className='text-2xl'/>:<BiSolidLike className='text-2xl'/>}{likes}</button>
-                <button className='' onClick={toggleDislike}>{!disliked?<BiDislike className='text-2xl'/>:<BiSolidDislike className='text-2xl'/>}</button>
-            </div>
+        <div className='relative'>
+            <button onClick={toggleModal}><BsThreeDotsVertical /></button>
+            {isModalOpen && <div className='absolute right-0 bg-white p-2 rounded-lg text-black'>
+                {deletion && <div>
+                    <button onClick={deletingComment}>Delete</button>
+                    <button>Edit</button>
+                </div>}
+                {!deletion && <button>Report</button>}
+            </div>}
         </div>
     </div>
   )

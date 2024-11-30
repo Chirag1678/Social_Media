@@ -24,6 +24,7 @@ const Playlists = () => {
         const response = await createPlaylist(data.title,data.description);
         console.log("Playlist created successfully:", response);
         alert("Playlist created successfully!");
+        document.querySelector("form").reset();
         closeModal();
     } catch (error) {
         console.error("Error creating playlist:", error);

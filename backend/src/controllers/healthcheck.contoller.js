@@ -9,4 +9,3 @@ const healthcheck = asyncHandler(async (req, res) => {
 })
 
 export { healthcheck };
-    

@@ -25,6 +25,7 @@ const Tweets = () => {
         // console.log(data);
         console.log("Tweet created successfully:", response);
         alert("Tweet created successfully!");
+        document.querySelector("form").reset();
         closeModal();
     } catch (error) {
         console.error("Error creating tweet:", error);

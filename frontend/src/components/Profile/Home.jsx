@@ -23,6 +23,7 @@ const Home = () => {
       const response = await createVideo(data);
       console.log("Video created successfully:", response);
       alert("Video uploaded successfully!");
+      document.querySelector("form").reset();
       closeModal();
     } catch (error) {
       console.error("Error uploading video:", error);

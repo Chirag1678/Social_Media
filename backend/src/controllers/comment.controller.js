@@ -104,8 +104,53 @@ const addComment = asyncHandler(async (req, res) => {
         throw new ApiError(500, "Error creating comment");
     }
 
+    // Fetch the newly added comment in the desired format
+    const [populatedComment] = await Comment.aggregate([
+        {
+            $match: { _id: comment._id },
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "owner",
+                foreignField: "_id",
+                as: "owner",
+                pipeline: [
+                    {
+                        $project: {
+                            username: 1,
+                            email: 1,
+                            avatar: 1,
+                        },
+                    },
+                ],
+            },
+        },
+        {
+            $lookup: {
+                from: "likes",
+                localField: "_id",
+                foreignField: "comment",
+                as: "likes",
+                pipeline: [
+                    {
+                        $count: "likes",
+                    },
+                ],
+            },
+        },
+        {
+            $unwind: "$owner",
+        },
+        {
+            $addFields: {
+                likes: { $ifNull: [{ $arrayElemAt: ["$likes.likes", 0] }, 0] }, // Handle case with no likes
+            },
+        },
+    ]);
+    
     //return success response
-    res.status(201).json(new ApiResponse(200, comment, "Comment added successfully"));
+    res.status(201).json(new ApiResponse(200, populatedComment, "Comment added successfully"));
 })
 
 const updateComment = asyncHandler(async (req, res) => {
