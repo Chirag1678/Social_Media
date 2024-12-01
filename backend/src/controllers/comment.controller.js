@@ -3,6 +3,7 @@ import { Comment } from "../models/comment.model.js";
 import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { addTweet } from "../../../frontend/src/store/tweetSlice.js";
 
 const getVideoComments = asyncHandler(async (req, res) => {
     //get videoId from req.params
@@ -153,6 +154,155 @@ const addComment = asyncHandler(async (req, res) => {
     res.status(201).json(new ApiResponse(200, populatedComment, "Comment added successfully"));
 })
 
+const getTweetComments = asyncHandler(async (req, res) => {
+    //get tweetId from req.params
+    const {tweetId} = req.params;
+
+    //check if videoId is valid
+    if(!isValidObjectId(tweetId)){
+        throw new ApiError(400, "Invalid tweet id");
+    }
+
+    //get query params
+    const {page = 1, limit = 10} = req.query;
+
+    //get comments for the video
+    const comments = await Comment.aggregatePaginate(
+        Comment.aggregate([
+            {
+                $match: {tweet: new mongoose.Types.ObjectId(tweetId)}
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "owner",
+                    foreignField: "_id",
+                    as: "owner",
+                    pipeline: [
+                        {
+                            $project: {
+                                username: 1,
+                                email: 1,
+                                avatar: 1
+                            }
+                        }
+                    ]
+                } 
+            },
+            {
+                $lookup: {
+                    from: "likes",
+                    localField: "_id",
+                    foreignField: "comment",
+                    as: "likes",
+                    pipeline: [
+                        {
+                            $count: "likes",
+                        },
+                    ],
+                },
+            },
+            {
+                $unwind: "$owner",
+            },
+            {
+                $addFields: {
+                    likes: { $ifNull: [{ $arrayElemAt: ["$likes.likes", 0] }, 0] }, // Handle case with no likes
+                },
+            },
+        ]),
+        {
+            page,
+            limit
+        }
+    );
+
+    //return success response
+    res.status(200).json(new ApiResponse(200, comments, "Comments found"));
+
+})
+
+const addTweetComment = asyncHandler(async (req, res) => {
+    //get tweetId from req.params
+    const {tweetId} = req.params;
+
+    //check if tweetId is valid
+    if(!isValidObjectId(tweetId)){
+        throw new ApiError(400, "Invalid tweet id");
+    }
+
+    //get comment content from req.body
+    const {content} = req.body;
+
+    //check if content is provided
+    if(!content){
+        throw new ApiError(400, "Content is required");
+    }
+
+    //get user id from req.user
+    const userId = req.user._id;
+
+    //create a new comment
+    const comment = await Comment.create({
+        content,
+        tweet: tweetId,
+        owner: userId
+    });
+
+    //check if comment is created
+    if(!comment){
+        throw new ApiError(500, "Error creating comment");
+    }
+
+    // Fetch the newly added comment in the desired format
+    const [populatedComment] = await Comment.aggregate([
+        {
+            $match: { _id: comment._id },
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "owner",
+                foreignField: "_id",
+                as: "owner",
+                pipeline: [
+                    {
+                        $project: {
+                            username: 1,
+                            email: 1,
+                            avatar: 1,
+                        },
+                    },
+                ],
+            },
+        },
+        {
+            $lookup: {
+                from: "likes",
+                localField: "_id",
+                foreignField: "comment",
+                as: "likes",
+                pipeline: [
+                    {
+                        $count: "likes",
+                    },
+                ],
+            },
+        },
+        {
+            $unwind: "$owner",
+        },
+        {
+            $addFields: {
+                likes: { $ifNull: [{ $arrayElemAt: ["$likes.likes", 0] }, 0] }, // Handle case with no likes
+            },
+        },
+    ]);
+    
+    //return success response
+    res.status(201).json(new ApiResponse(200, populatedComment, "Comment added successfully"));
+})
+
 const updateComment = asyncHandler(async (req, res) => {
     //get commentId from req.params
     const {commentId} = req.params;
@@ -232,4 +382,4 @@ const deleteComment = asyncHandler(async (req, res) => {
     res.status(200).json(new ApiResponse(200, null, "Comment deleted successfully"));
 })
 
-export { getVideoComments,  addComment,  updateComment, deleteComment };
+export { getVideoComments, addComment, getTweetComments, addTweetComment, updateComment, deleteComment };

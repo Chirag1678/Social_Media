@@ -119,6 +119,69 @@ const getUserTweets = asyncHandler(async (req, res) => {
     res.status(200).json(new ApiResponse(200, {tweets}, "User tweets found"))
 })
 
+const getTweetById = asyncHandler(async (req, res) => {
+    //get tweetId from req.params
+    const { tweetId } = req.params;
+
+    //check if tweetId is valid
+    if(!isValidObjectId(tweetId)){
+        throw new ApiError(400, "Invalid tweet id"); //return error if tweetId is invalid
+    }
+
+    //find tweet by id
+    const tweet = await Tweet.aggregate([
+        {
+            $match: { _id: new mongoose.Types.ObjectId(tweetId) }
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "owner",
+                foreignField: "_id",
+                as: "owner"
+            }
+        },
+        {
+            $lookup: {
+                from: "likes",
+                localField: "_id",
+                foreignField: "tweet",
+                as: "likes",
+                pipeline: [
+                    {
+                        $count: "likes",
+                    },
+                ],
+            },
+        },
+        {
+            $unwind: "$owner",
+        },
+        {
+            $addFields: {
+                likes: { $ifNull: [{ $arrayElemAt: ["$likes.likes", 0] }, 0] }, // Handle case with no likes
+            },
+        },
+        {
+            $unwind: "$owner"
+        },
+        {
+            $project: {
+                "owner.password": 0,
+                "owner.email": 0,
+                "owner.createdAt": 0,
+                "owner.updatedAt": 0,
+                "owner.refreshToken": 0,
+                "owner.watchHistory": 0,
+                "owner.__v": 0
+            }
+        }
+    ]);
+
+    //return success response
+    res.status(200).json(new ApiResponse(200, {tweet}, "Tweet found"))
+})
+
 const updateTweet = asyncHandler(async (req, res) => {
     //get tweetId from req.params
     const { tweetId } = req.params;
@@ -208,4 +271,4 @@ const deleteTweet = asyncHandler(async (req, res) => {
     res.status(200).json(new ApiResponse(200, null, "Tweet deleted successfully"));
 })
 
-export { createTweet, getUserTweets, updateTweet, deleteTweet };
+export { createTweet, getUserTweets, updateTweet, deleteTweet, getTweetById };

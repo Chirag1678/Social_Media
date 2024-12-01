@@ -12,6 +12,7 @@ import Signup from './pages/SignUp.jsx'
 import VideoPage from './pages/VideoPage.jsx'
 import Profile from './pages/Profile.jsx'
 import PlaylistPage from './pages/PlaylistPage.jsx'
+import TweetPage from './pages/TweetPage.jsx'
 
 const router = createBrowserRouter([
   {
@@ -54,6 +55,12 @@ const router = createBrowserRouter([
         path: "/playlist/:playlistId",
         element: (
           <PlaylistPage />
+        )
+      },
+      {
+        path: "/tweet/:tweetId",
+        element: (
+          <TweetPage />
         )
       }
     ]

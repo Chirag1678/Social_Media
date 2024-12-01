@@ -2,10 +2,13 @@ import { formatDistanceToNow } from 'date-fns';
 import { useEffect, useState } from 'react';
 import { BiDislike, BiLike, BiSolidDislike, BiSolidLike } from 'react-icons/bi';
 import { isLikedTweet, toggleTweetLike } from '../../utils/Like';
+import { MdOutlineComment } from 'react-icons/md';
+import { useNavigate } from 'react-router-dom';
 const TweetCard = ({tweet}) => {
   const [likes, setLikes] = useState(tweet.likes);
   const [liked, setLiked] = useState(false);
   const [disliked, setDisliked] = useState(false);
+  const navigate = useNavigate();
   useEffect(()=>{
     const liked = async () => {
         try {
@@ -74,7 +77,7 @@ const TweetCard = ({tweet}) => {
     }
   }
   return (
-    <div className="w-full rounded-xl border-[0.01rem] p-5 my-6 flex items-start gap-3 ">
+    <div className="w-full rounded-xl border-[0.01rem] px-5 pt-5 pb-2 my-6 flex items-start gap-3 ">
     <div className="w-12 h-12 rounded-full overflow-hidden flex items-center justify-center">
         <img src={tweet.owner.avatar} alt={tweet.owner.fullName} />
       </div>
@@ -87,9 +90,12 @@ const TweetCard = ({tweet}) => {
             {tweet.content}
         </div>
         {tweet.image && <img src={tweet.image} alt={tweet.content} className="w-full rounded-xl mt-3"/>}
-        <div className='flex items-center'>
-        <button className='px-5 border-r-white flex items-center gap-2' onClick={toggleLike}>{!liked?<BiLike className='text-2xl'/>:<BiSolidLike className='text-2xl'/>}{likes}</button>
-        <button className='px-5' onClick={toggleDislike}>{!disliked?<BiDislike className='text-2xl'/>:<BiSolidDislike className='text-2xl'/>}</button>
+        <div className='flex items-center gap-4 mt-2'>
+            <div className='flex items-center'>
+                <button className='px-5 border-r-white flex items-center gap-2' onClick={toggleLike}>{!liked?<BiLike className='text-2xl'/>:<BiSolidLike className='text-2xl'/>}{likes}</button>
+                <button className='' onClick={toggleDislike}>{!disliked?<BiDislike className='text-2xl'/>:<BiSolidDislike className='text-2xl'/>}</button>
+            </div>
+            <button className='text-2xl' onClick={()=>navigate(`/tweet/${tweet._id}`)}><MdOutlineComment /></button>
         </div>
       </div>
     </div>

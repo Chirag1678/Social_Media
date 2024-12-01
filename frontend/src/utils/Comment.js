@@ -10,6 +10,16 @@ const getCommentsById = async (videoId) => {
   }
 };
 
+const getTweetCommentsById = async (tweetId) => {
+  try {
+    const response = await axios.get(`/api/v1/comments/t/${tweetId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching tweet data:', error);
+    throw error;
+  }
+};
+
 const createComment = async (videoId,data) => {
   try {
     const response = await axios.post(`/api/v1/comments/${videoId}`, {
@@ -22,7 +32,21 @@ const createComment = async (videoId,data) => {
     console.error('Error creating comment:', error);
     throw error;
   }
-}
+};
+
+const createTweetComment = async (tweetId,data) => {
+  try {
+    const response = await axios.post(`/api/v1/comments/t/${tweetId}`, {
+      content: data.content,
+    }, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error creating comment:', error);
+    throw error;
+  }
+};
 
 const deleteComment = async (commentId) => {
   try {
@@ -36,10 +60,10 @@ const deleteComment = async (commentId) => {
   }
 };
 
-const updateComment = async (commentId, data) => {
+const updateComment = async (commentId, content) => {
   try {
     const response = await axios.patch(`/api/v1/comments/c/${commentId}`, {
-      content: data.content,
+      content: content.content,
     }, {
       withCredentials: true,
     });
@@ -50,4 +74,4 @@ const updateComment = async (commentId, data) => {
   }
 };
 
-export { getCommentsById, createComment, deleteComment, updateComment };
+export { getCommentsById, createComment, deleteComment, updateComment, getTweetCommentsById, createTweetComment };

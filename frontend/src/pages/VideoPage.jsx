@@ -123,8 +123,13 @@ const VideoPage = () => {
   const deleteCommentHandler = (commentId) => {
     setComments((prevComments) => prevComments.filter((comment) => comment._id !== commentId));
   };
+  const updateCommentHandler = (commentId, newContent) => {
+    setComments((prevComments) => prevComments.map((comment) => comment._id === commentId ? { ...comment, content: newContent } // Update content for the matching comment
+    : comment)
+    );
+  };
   if (!video) return <div>Loading...</div>;
-  const { video: videoDetails, user: loggedUser } = video;
+  const { video: videoDetails} = video;
 
   return (
     <div className="video-page px-4 py-10 min-h-screen bg-black">
@@ -179,7 +184,7 @@ const VideoPage = () => {
             </div>
         </form>
         {comments.map((comment)=>(
-            <CommentCard key={comment._id} comment={comment} deleteCommentHandler={deleteCommentHandler}/>
+            <CommentCard key={comment._id} comment={comment} deleteCommentHandler={deleteCommentHandler} updateCommentHandler={updateCommentHandler}/>
         ))}
       </div>
     </div>

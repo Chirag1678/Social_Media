@@ -30,4 +30,14 @@ const getUserTweets = async (userId) => {
     }
 }
 
-export { createTweet, getUserTweets };
+const getTweetById = async (tweetId) => {
+    try {
+        const response = await axios.get(`/api/v1/tweets/${tweetId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching tweet data:', error);
+        throw error;
+    }
+}
+
+export { createTweet, getUserTweets, getTweetById };
