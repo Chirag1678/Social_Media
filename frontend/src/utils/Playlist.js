@@ -34,4 +34,30 @@ const getPlaylistById = async (playlistId) => {
     }
 }
 
-export { createPlaylist, getUserPlaylists, getPlaylistById };
+const addVideoToPlaylist = async (playlistId,videoId) => {
+    try {
+        const response = await axios.patch(`/api/v1/playlist/add/${videoId}/${playlistId}`, {
+        }, {
+            withCredentials: true,
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error adding video to playlist:', error);
+        throw error;
+    }
+}
+
+const removeVideoFromPlaylist = async (playlistId,videoId) => {
+    try {
+        const response = await axios.patch(`/api/v1/playlist/remove/${videoId}/${playlistId}`, {
+        }, {
+            withCredentials: true,
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error removing video from playlist:', error);
+        throw error;
+    }
+}
+
+export { createPlaylist, getUserPlaylists, getPlaylistById, addVideoToPlaylist, removeVideoFromPlaylist };

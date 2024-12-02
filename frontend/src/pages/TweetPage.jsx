@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { useParams } from "react-router-dom";
 import { getTweetById } from "../utils/Tweet";
-import { createComment, getTweetCommentsById } from "../utils/Comment";
+import { createTweetComment, getTweetCommentsById } from "../utils/Comment";
 import { CommentCard, TweetCard } from "../components";
 import { useSelector } from "react-redux";
 import { useForm } from "react-hook-form";
@@ -17,7 +17,6 @@ const TweetPage = () => {
 
   //Fetch tweet data and related details
   useEffect(() => {
-
     const fetchTweet = async () => {
       try {
         if(loggedInUser){
@@ -40,7 +39,7 @@ const TweetPage = () => {
   const commentCreation = async (data) => {
     // Placeholder for comment creation logic (API call or state update)
     try {
-        const response = await createComment(tweetId, data);
+        const response = await createTweetComment(tweetId, data);
         // console.log(data);
         console.log("Comment created successfully:", response);
         setComments((prevComments) => [response.data, ...prevComments]);
@@ -64,7 +63,7 @@ const TweetPage = () => {
       <div className="w-[75vw]">
         {tweet && <TweetCard tweet={tweet} />}
       </div>
-        {/* Comments Section */}
+      {/* Comments Section */}
       <div className='comment-section w-[75vw] mt-10'>
         <p className='flex gap-8'>
             <span>{comments.length} Comments</span>

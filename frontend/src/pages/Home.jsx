@@ -4,7 +4,6 @@ import { allVideos } from "../utils/Video";
 
 const Home = () => {
   const [videos, setVideos] = useState([]);
-  // const video = useSelector((state) => state.video.videos);
   useEffect(() => {
     const getAllVideos = async () => {
       try{
