@@ -1,15 +1,25 @@
 import { useEffect, useState } from "react";
 import VideoCard from "../components/Video/VideoCard";
 import { allVideos } from "../utils/Video";
+import { useDispatch, useSelector } from "react-redux";
+import { getUserPlaylists } from "../utils/Playlist.js";
+import { setPlaylists } from "../store/playlistSlice.js";
 
 const Home = () => {
+  const dispatch = useDispatch();
   const [videos, setVideos] = useState([]);
+  const user = useSelector((state) => state.auth.user);
   useEffect(() => {
     const getAllVideos = async () => {
       try{
         const response = await allVideos();
         // console.log(response.data);
         setVideos(response.data);
+        if(user){
+          const playlists = await getUserPlaylists(user.data?._id);
+          // console.log(playlists);
+          dispatch(setPlaylists(playlists.data));
+        }
       }
       catch(error){
         console.error('Error fetching video data:', error);
@@ -17,7 +27,7 @@ const Home = () => {
       }
     }
     getAllVideos();
-  }, []);
+  }, [user, dispatch]);
   // console.log(videos.docs);
   return (
     <div className="w-full max-w-7xl mx-auto md:px-5 px-4 py-10 min-h-screen flex flex-wrap gap-16">

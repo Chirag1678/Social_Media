@@ -9,8 +9,6 @@ import { Button, ProfileHome, ProfilePlaylists, ProfileTweets } from "../compone
 import { allVideos } from "../utils/Video.js";
 import { useDispatch, useSelector } from "react-redux";
 import { setVideos } from "../store/videoSlice.js";
-import { getUserPlaylists } from "../utils/Playlist.js";
-import { setPlaylists } from "../store/playlistSlice.js";
 import { getUserTweets } from "../utils/Tweet.js";
 import { setTweets } from "../store/tweetSlice.js";
 import { toggleSubscribtion } from "../utils/Subscription.js";
@@ -38,8 +36,8 @@ const Profile = () => {
         const filteredVideos = videos.data.docs.filter((video) => video.owner[0].username === profile);
         setFilteredVideos(filteredVideos.length);
         dispatch(setVideos(filteredVideos));
-        const playlists = await getUserPlaylists(channelData.data._id);
-        dispatch(setPlaylists(playlists.data));
+        // const playlists = await getUserPlaylists(channelData.data._id);
+        // dispatch(setPlaylists(playlists.data));
         const tweets = await getUserTweets(channelData.data._id);
         dispatch(setTweets(tweets.data));
       } catch (error) {
@@ -77,7 +75,7 @@ const Profile = () => {
       case "home":
         return <ProfileHome/>;
       case "playlists":
-        return <ProfilePlaylists/>;
+        return <ProfilePlaylists userId={channel?._id}/>;
       case "tweets":
         return <ProfileTweets/>;
       default:

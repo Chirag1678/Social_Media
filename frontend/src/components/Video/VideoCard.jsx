@@ -76,7 +76,7 @@ function VideoCard({ video }) {
   };
   const addVideoInPlaylist =async (playlistId) => {
     try {
-      console.log(playlistId);
+      // console.log(playlistId);
       const response =await addVideoToPlaylist(playlistId, video._id);
       console.log("Video added to playlist:", response);
       alert("Video added to playlist successfully!");

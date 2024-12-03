@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button, Input, PlaylistCard, TextArea } from "../index";
-import { createPlaylist } from "../../utils/Playlist";
-import { useSelector } from "react-redux";
+import { createPlaylist, getUserPlaylists } from "../../utils/Playlist";
 
-const Playlists = () => {
+const Playlists = ({userId}) => {
+    // console.log(userId);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { register, handleSubmit, formState: { errors, isSubmitted } } = useForm();
   const [playlists, setPlaylists] = useState([]);
@@ -12,12 +12,19 @@ const Playlists = () => {
   const openModal = () => setIsModalOpen(true); // Open modal
   const closeModal = () => setIsModalOpen(false); // Close modal
 
-  const playlist = useSelector((state) => state.playlist.playlists);
   useEffect(() => {
-    if (playlist) {
-        setPlaylists(playlist.playlists); // Update state only when `playlist` changes
+    const fetchUserPlaylists = async () => {
+        try {
+            const response = await getUserPlaylists(userId);
+            // console.log(response.data.playlists);
+            setPlaylists(response.data.playlists);
+        } catch (error) {
+            console.error("Error fetching playlists: "+error);
+            alert("Error fetching playlists, please try again");
+        }
     }
-  }, [playlist]);
+    fetchUserPlaylists();
+  }, [userId]);
   const playlistCreation = async (data) => {
     // Placeholder for playlist creation logic (API call or state update)
     try {
