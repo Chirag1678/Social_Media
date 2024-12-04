@@ -1,9 +1,28 @@
 import axios from 'axios';
 
-const allVideos = async () => {
+const allVideos = async (params) => {
   try {
-    const response = await axios.get('/api/v1/videos');
+    let url = '/api/v1/videos';  // Default URL
+    if (params) {
+      const { query, page = 1, limit = 10, sortBy, sortType, userId } = params;
+      
+      // Construct query string for all available params
+      const queryParams = new URLSearchParams();
+      if (query) queryParams.append('query', query);
+      if (page) queryParams.append('page', page);
+      if (limit) queryParams.append('limit', limit);
+      if (sortBy) queryParams.append('sortBy', sortBy);
+      if (sortType) queryParams.append('sortType', sortType);
+      if (userId) queryParams.append('userId', userId);
+      
+      // Attach the query parameters to the URL
+      url = `/api/v1/videos?${queryParams.toString()}`;
+    }
+
+    // Send the request with or without query parameters
+    const response = await axios.get(url);
     return response.data;
+
   } catch (error) {
     console.error('Error fetching video data:', error);
     throw error;

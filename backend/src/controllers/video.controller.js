@@ -9,18 +9,26 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 
 const getAllVideos = asyncHandler(async (req, res) => {
     const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query; //get query parameters
+    // console.log(req.query);
+
+    // Validate pagination parameters
+    const pageNumber = parseInt(page, 10) || 1;
+    const pageSize = parseInt(limit, 10) || 10;
+    const skip = (pageNumber - 1) * pageSize;
 
     //set query parameters
     const queryParam = {
-        ...(query && { title: { $regex: query, $options: "i" } }),
         ...(userId && { owner: userId }),
         ...(sortBy && { [sortBy]: sortType === "desc" ? -1 : 1 }),
-        page,
-        limit,
     };
 
     //
     var aggregate = Video.aggregate([
+        {
+            $match: {
+                ...(query && { title: { $regex: query, $options: 'i'}})
+            }
+        },
         {
             $lookup: {
                 from: "users",
@@ -38,15 +46,21 @@ const getAllVideos = asyncHandler(async (req, res) => {
                 ]
             }
         },
+        {
+            $skip: skip,  // Skip documents for pagination
+        },
+        {
+            $limit: pageSize,  // Limit the results based on the page size
+        },
     ]);
 
     //get videos based on query parameters
-    const videos = await Video.aggregatePaginate(aggregate,queryParam,(err,res)=>{
-        if(err){
-            throw new ApiError(500, "Error fetching videos",err, err.stack);
-        }
-        return res;
-    }); //paginate videos
+    const videos = await Video.aggregatePaginate(aggregate,queryParam); //paginate videos
+
+    //if no video is found, return error
+    if(!videos){
+        throw new ApiError(500, "Error getting videos");
+    }
 
     //return success response
     res.status(200).json(new ApiResponse(200, videos, "Videos found"));
