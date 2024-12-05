@@ -2,23 +2,22 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
 import { VideoCard } from "../index.js";
-import { createVideo } from "../../utils/Video.js";
+import { createVideo, deleteVideo } from "../../utils/Video.js";
 import {Button, Input, TextArea} from "../index"
 
 const Home = () => {
-//   console.log(profile);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { register, handleSubmit, formState: { errors, isSubmitted }  } = useForm();
   const [filteredvideos, setFilteredVideos] = useState([]);
   const video = useSelector((state) => state.video.videos);
+
   useEffect(() => {
     if (video) {
       setFilteredVideos(video); // Update state only when `video` changes
     }
   }, [video]);
-//   console.log(filteredvideos);
+
   const videoCreation = async (data) => {
-    // console.log(data);
     try {
       const response = await createVideo(data);
       console.log("Video created successfully:", response);
@@ -30,13 +29,34 @@ const Home = () => {
       alert("Failed to upload video. Please try again.");
     }
   };
+
+  const videoDeletion = async (event,videoId) => {
+    try {
+        event.stopPropagation();
+        const verify = confirm("Are you sure you want to delete");
+        if(verify){
+            const response = await deleteVideo(videoId);
+            setFilteredVideos((prev) => prev.filter((vid) => vid._id !== videoId));
+            console.log("Video deleted successfully",response);
+            alert("Video deleted successfully");
+            return true;
+        }
+        else{
+            console.log("Video deletion cancelled");
+            return false;
+        }
+    } catch (error) {
+        console.error("Error deleting video:", error);
+        alert("Failed to delete video. Please try again.");
+    }
+  }
   const isError = isSubmitted && Object.keys(errors).length > 0;
-  // console.log(channel);
+
   const openModal = () => setIsModalOpen(true); // Open modal
   const closeModal = () => setIsModalOpen(false); // Close modal
   return (
     <div>
-        {!filteredvideos && <div className="flex items-center justify-center h-[60vh]">
+        {filteredvideos.length==0 && <div className="flex items-center justify-center h-[60vh]">
         <div className="text-center">
           <div className="h-40 w-40 rounded-full bg-green-500 mx-auto"></div>
           <p>Create content on any device</p>
@@ -49,7 +69,7 @@ const Home = () => {
       </div>}
       {filteredvideos && <div className="flex gap-16">
         {filteredvideos.map((video) => (
-          <VideoCard key={video._id} video={video}/>
+          <VideoCard key={video._id} video={video} onDelete={event =>videoDeletion(event,video._id)}/>
         ))}
       </div>}
       <div className="text-center">

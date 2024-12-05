@@ -50,12 +50,23 @@ const createVideo = async (data) => {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
+      withCredentials: true
     });
     return response.data;
   } catch (error) {
     console.error('Error creating video:', error);
     throw error;
   }
+};
+
+const deleteVideo = async (videoId) => {
+  try {
+    const response = await axios.delete(`/api/v1/videos/${videoId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting video:', error);
+    throw error;
+  }
 }
 
-export { allVideos, getVideoById, createVideo };
+export { allVideos, getVideoById, createVideo, deleteVideo };

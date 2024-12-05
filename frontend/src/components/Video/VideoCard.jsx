@@ -4,15 +4,16 @@ import ReactPlayer from 'react-player'
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BsThreeDotsVertical } from 'react-icons/bs';
-import { CiBookmark, CiFlag1 } from "react-icons/ci";
+import { CiBookmark, CiEdit, CiFlag1, CiSquareRemove } from "react-icons/ci";
 import { useSelector } from 'react-redux';
 import { addVideoToPlaylist, removeVideoFromPlaylist, getPlaylistById } from '../../utils/Playlist';
 
-function VideoCard({ video }) {
+function VideoCard({ video, onDelete }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [playlistModalOpen, setPlaylistModalOpen] = useState(false);
   const [playlists, setPlaylists] = useState([]);
   const playlistsData = useSelector((state) => state.playlist.playlists);
+  const loggedInUser = useSelector((state) => state.auth.user);
   const navigate = useNavigate();
   useEffect(() => {
     const fetchPlaylists = async () => {
@@ -97,6 +98,7 @@ function VideoCard({ video }) {
   }
   const [isPlaying, setIsPlaying] = useState(false);
   const channel = video.owner[0];
+  const userChannel = channel._id === loggedInUser?.data._id;
   return (
     <>
     <div className="w-[27%] h-[35vh]" onClick={handleCardClick}>
@@ -130,7 +132,11 @@ function VideoCard({ video }) {
           {modalOpen && <div className='absolute bg-slate-800 w-[20vw] rounded-xl text-white'>
             <button className='m-5 flex items-center gap-3' onClick={togglePlaylistModal}><span><CiBookmark className='text-2xl'/></span>Save to playlist</button>
             <hr />
-            <h1 className='m-5 flex items-center gap-3'><span><CiFlag1 className='text-2xl'/></span>Report</h1>
+            <button className='m-5 flex items-center gap-3'><span><CiFlag1 className='text-2xl'/></span>Report</button>
+            {userChannel && <><hr />
+            <button className='m-5 flex items-center gap-3'><span><CiEdit className='text-2xl'/></span>Edit</button>
+            <hr />
+            <button className='m-5 flex items-center gap-3' onClick={onDelete}><span><CiSquareRemove className='text-2xl'/></span>Delete</button></>}
           </div>}
         </div>
       </div>
