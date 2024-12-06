@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
 import { VideoCard } from "../index.js";
-import { createVideo, deleteVideo } from "../../utils/Video.js";
+import { createVideo, deleteVideo, updateVideo } from "../../utils/Video.js";
 import {Button, Input, TextArea} from "../index"
 
 const Home = () => {
@@ -50,8 +50,34 @@ const Home = () => {
         alert("Failed to delete video. Please try again.");
     }
   }
-  const isError = isSubmitted && Object.keys(errors).length > 0;
 
+  const videoUpdation = async (data,videoId) => {
+    try {
+        // console.log(`${data.title},${videoId}`);
+        const response = await updateVideo(data,videoId);
+        console.log("Video updated successfully",response);
+
+        // Update the filteredVideos state
+        setFilteredVideos((prevVideos) =>
+            prevVideos.map((video) =>
+              video._id === videoId
+                ? {
+                    ...video,
+                    title: data.title || video.title,
+                    description: data.description || video.description,
+                    thumbnail: response.data?.thumbnail || video.thumbnail,
+                  }
+                : video
+            )
+        );
+        alert("Video updated successfully");
+    } catch (error) {
+        console.error("Error updating video:", error);
+        alert("Failed to update video. Please try again.");
+    }
+  }
+  const isError = isSubmitted && Object.keys(errors).length > 0;
+  console.log(filteredvideos);
   const openModal = () => setIsModalOpen(true); // Open modal
   const closeModal = () => setIsModalOpen(false); // Close modal
   return (
@@ -69,7 +95,7 @@ const Home = () => {
       </div>}
       {filteredvideos && <div className="flex gap-16">
         {filteredvideos.map((video) => (
-          <VideoCard key={video._id} video={video} onDelete={event =>videoDeletion(event,video._id)}/>
+          <VideoCard key={video._id} video={video} onDelete={event =>videoDeletion(event,video._id)} onUpdate={videoUpdation}/>
         ))}
       </div>}
       <div className="text-center">

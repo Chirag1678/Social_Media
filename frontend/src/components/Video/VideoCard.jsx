@@ -7,14 +7,21 @@ import { BsThreeDotsVertical } from 'react-icons/bs';
 import { CiBookmark, CiEdit, CiFlag1, CiSquareRemove } from "react-icons/ci";
 import { useSelector } from 'react-redux';
 import { addVideoToPlaylist, removeVideoFromPlaylist, getPlaylistById } from '../../utils/Playlist';
+import { Button, Input, TextArea } from '../index';
+import { useForm } from 'react-hook-form';
 
-function VideoCard({ video, onDelete }) {
+function VideoCard({ video, onDelete, onUpdate }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [playlistModalOpen, setPlaylistModalOpen] = useState(false);
+  const [VideoModalOpen, setVideoModalOpen] = useState(false);
   const [playlists, setPlaylists] = useState([]);
+  const [isError, setIsError] = useState(false);
+  const formData = new FormData();
+
   const playlistsData = useSelector((state) => state.playlist.playlists);
   const loggedInUser = useSelector((state) => state.auth.user);
   const navigate = useNavigate();
+  const { register, handleSubmit, formState: { errors }  } = useForm();
   useEffect(() => {
     const fetchPlaylists = async () => {
       if(playlistsData){
@@ -57,6 +64,13 @@ function VideoCard({ video, onDelete }) {
     setModalOpen(false);
     setPlaylistModalOpen(!playlistModalOpen);
   }
+  const toggleVideoModal = (event) => {
+    if(event){
+      event.stopPropagation();
+    }
+    setModalOpen(false);
+    setVideoModalOpen(!VideoModalOpen);
+  }
   const handleCheckboxChange =async (playlistId, isChecked) => {
     try {
       if(isChecked){
@@ -95,7 +109,21 @@ function VideoCard({ video, onDelete }) {
       console.error('Failed to remove video from playlist:', error);
       alert("Failed to remove video from playlist. Please try again.");
     }
-  }
+  };
+  const handleUpdateSubmit =async (data) => {
+    if (!data.title && !data.description && !data.thumbnail?.length) {
+      setIsError(true);
+      return;
+    }
+    setIsError(false);
+
+    // Proceed with the update logic
+    // console.log("Update data:", data);
+    // alert("Video updated successfully!");
+    // console.log(data);
+    await onUpdate(data,video._id);
+    toggleVideoModal();
+  };
   const [isPlaying, setIsPlaying] = useState(false);
   const channel = video.owner[0];
   const userChannel = channel._id === loggedInUser?.data._id;
@@ -134,15 +162,15 @@ function VideoCard({ video, onDelete }) {
             <hr />
             <button className='m-5 flex items-center gap-3'><span><CiFlag1 className='text-2xl'/></span>Report</button>
             {userChannel && <><hr />
-            <button className='m-5 flex items-center gap-3'><span><CiEdit className='text-2xl'/></span>Edit</button>
+            <button className='m-5 flex items-center gap-3' onClick={toggleVideoModal}><span><CiEdit className='text-2xl'/></span>Edit</button>
             <hr />
             <button className='m-5 flex items-center gap-3' onClick={onDelete}><span><CiSquareRemove className='text-2xl'/></span>Delete</button></>}
           </div>}
         </div>
       </div>
     </div>
-    {playlistModalOpen && <div className='absolute w-[99vw] h-[63vh] left-1/2 -translate-x-1/2 bg-black/40 flex items-center justify-center'>
-      <div className='bg-slate-800 rounded-xl p-5 flex flex-col items-start gap-5'>
+    {playlistModalOpen && <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
+      <div className='bg-[#71797E] rounded-xl p-5 flex flex-col items-start gap-5'>
         <div className='flex items-center justify-between'>
           <h1 className='pr-5'>Add videos to...</h1>
           <button onClick={togglePlaylistModal}>X</button>
@@ -158,6 +186,49 @@ function VideoCard({ video, onDelete }) {
         </div>
       </div>
     </div>}
+    {VideoModalOpen && <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-[#71797E] rounded-3xl w-[70vw] h-[80vh]" onClick={e=>e.stopPropagation()}>
+            <h2 className="text-xl font-semibold py-4 px-6">Update Video</h2>
+            <hr />
+            <h2 className="font-medium text-2xl mt-3 px-6">Details</h2>
+            <div className="px-6">
+              <form className="text-black" onSubmit={handleSubmit(handleUpdateSubmit)}>
+                {/* Common Error Message */}
+                {isError && (
+                  <p className="text-red-500 text-sm font-bold">
+                    At least one field must be updated. Please provide a title, description, or thumbnail.
+                  </p>
+                )}
+
+                {/* Title Field */}
+                <Input 
+                  label="Title: " 
+                  placeholder="Update title"
+                  type="text" 
+                  name="title" 
+                  {...register("title")}
+                />
+
+                {/* Description Field */}
+                <TextArea 
+                  label="Description: " 
+                  placeholder="Update description" 
+                  name="description" 
+                  {...register("description")}
+                />
+                <Input
+                  label="Thumbnail: "
+                  type="file" accept="image/*" name="thumbnail"
+                  {...register("thumbnail")}
+                />
+                <div className="flex justify-end gap-3 mt-2">
+                  <Button bgColor="bg-gray-300" onClick={toggleVideoModal}>Cancel</Button>
+                  <Button type="submit" bgColor="bg-blue-500">Update Video</Button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>}
     </>
   )
 }

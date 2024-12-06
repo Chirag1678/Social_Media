@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import VideoCard from "../components/Video/VideoCard";
-import { allVideos, deleteVideo } from "../utils/Video";
+import { allVideos, deleteVideo, updateVideo } from "../utils/Video";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserPlaylists } from "../utils/Playlist.js";
 import { setPlaylists } from "../store/playlistSlice.js";
@@ -49,6 +49,32 @@ const Home = () => {
         alert("Failed to delete video. Please try again.");
     }
   }
+
+  const videoUpdation = async (data,videoId) => {
+    try {
+        // console.log(`${data.title},${videoId}`);
+        const response = await updateVideo(data,videoId);
+        console.log("Video updated successfully",response);
+
+        // Update the filteredVideos state
+        setVideos((prevVideos) =>
+            prevVideos.docs.map((video) =>
+              video._id === videoId
+                ? {
+                    ...video,
+                    title: data.title || video.title,
+                    description: data.description || video.description,
+                    thumbnail: response.data?.thumbnail || video.thumbnail,
+                  }
+                : video
+            )
+        );
+        alert("Video updated successfully");
+    } catch (error) {
+        console.error("Error updating video:", error);
+        alert("Failed to update video. Please try again.");
+    }
+  }
   // console.log(videos.docs);
   return (
     <div className="w-full max-w-7xl mx-auto md:px-5 px-4 py-10 min-h-screen flex flex-wrap gap-16">
@@ -70,7 +96,7 @@ const Home = () => {
       //       />
       //     </div>
       // </div>
-      <VideoCard key={video._id} video={video} onDelete={event=>videoDeletion(event,video._id)}/>
+      <VideoCard key={video._id} video={video} onDelete={event=>videoDeletion(event,video._id)} onUpdate={videoUpdation}/>
     ))}
     </div>
   )

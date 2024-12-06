@@ -67,6 +67,31 @@ const deleteVideo = async (videoId) => {
     console.error('Error deleting video:', error);
     throw error;
   }
+};
+
+const updateVideo = async (data,videoId) => {
+  try {
+    const formData = new FormData();
+    if(data.title){
+      formData.append('title', data.title);
+    }
+    if(data.description){
+      formData.append('description', data.description);
+    }
+    if(data.thumbnail && data.thumbnail.length > 0){
+      formData.append('thumbnail',data.thumbnail[0]);
+    }
+    const response = await axios.patch(`/api/v1/videos/${videoId}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+      withCredentials: true
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error updating video:", error);
+    throw error;
+  }
 }
 
-export { allVideos, getVideoById, createVideo, deleteVideo };
+export { allVideos, getVideoById, createVideo, deleteVideo, updateVideo };
