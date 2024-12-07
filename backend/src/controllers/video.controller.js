@@ -68,7 +68,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
 
 const publishAVideo = asyncHandler(async (req, res) => {
     //get video and thumbnail from req.files
-    const { title, description} = req.body
+    const { title, description, status} = req.body
 
     //check if title and description are provided
     if(!title || !description){
@@ -92,26 +92,62 @@ const publishAVideo = asyncHandler(async (req, res) => {
     if(!videoFile || !thumbnail){
         throw new ApiError(500, "Error uploading video and thumbnail")
     }
+
+    // Determine isPublished value based on status
+    const isPublished = status === 'public';
+
     //create video and save to database
-    const video = new Video({
+    const newVideo = new Video({
         videoFile: videoFile.url,
         thumbnail: thumbnail.url,
         title,
         description,
         owner: req.user._id,
-        duration: videoFile.duration
+        duration: videoFile.duration,
+        isPublished
     })
+
+    //save video to database
+    await newVideo.save()
+
+    // Use an aggregation pipeline to format the response
+    const [video] = await Video.aggregate([
+        {
+            $match: {
+                _id: new mongoose.Types.ObjectId(newVideo._id)
+            },
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "owner",
+                foreignField: "_id",
+                as: "owner",
+                pipeline: [
+                    {
+                        $project: {
+                            username: 1,
+                            email: 1,
+                            avatar: 1,
+                        },
+                    },
+                ],
+            },
+        },
+        {
+            $addFields: {
+                views: 0,
+            },
+        },
+    ]);
 
     //check if video is created
     if(!video){
         throw new ApiError(500, "Error creating video")
     }
 
-    //save video to database
-    await video.save()
-
     //return success response
-    res.status(201).json(new ApiResponse(201, {video, videoFile, thumbnail}, "Video published successfully"));
+    res.status(201).json(new ApiResponse(201, video, "Video published successfully"));
 });
 
 const getVideoById = asyncHandler(async (req, res) => {
@@ -207,7 +243,7 @@ const updateVideo = asyncHandler(async (req, res) => {
     }
 
     //get title, description from req.body
-    const { title, description } = req.body;
+    const { title, description, status } = req.body;
 
     //get thumbnail from req.file
     let thumbnailLocalPath;
@@ -216,6 +252,12 @@ const updateVideo = asyncHandler(async (req, res) => {
     //check if title, description or thumbnail is provided
     if(!(title || description || thumbnailLocalPath)){
         throw new ApiError(400, "Nothing to update");
+    }
+
+    // Get the existing video
+    const video = await Video.findById(videoId);
+    if (!video) {
+        throw new ApiError(404, "Video not found");
     }
 
     //if thumbnail is provided, upload to cloudinary
@@ -228,48 +270,26 @@ const updateVideo = asyncHandler(async (req, res) => {
     //if thumbnail is updated, delete old thumbnail from cloudinary
     if(thumbnailLocalPath){
         const oldThumbnail = await Video.findById(videoId).select("thumbnail");
-        // const oldThumbnail = await Video.aggregate([
-        //     {
-        //         $match: {
-        //             _id: new mongoose.Types.ObjectId(videoId)
-        //         }
-        //     },
-        //     {
-        //         $project: {
-        //             thumbnail: 1
-        //         }
-        //     },
-        //     {
-        //         $addFields:{
-        //             thumbnail:{
-        //                 $toString: "$thumbnail",
-        //             }
-        //         }
-        //     }
-        // ]);
-        console.log(typeof oldThumbnail, oldThumbnail.thumbnail.split("/").pop().split(".")[0]);
+        // console.log(typeof oldThumbnail, oldThumbnail.thumbnail.split("/").pop().split(".")[0]);
         const oldThumbnailId = oldThumbnail.thumbnail.split("/").pop().split(".")[0];
         await deleteFromCloudinary(oldThumbnailId); //delete old thumbnail from cloudinary
     }
 
-    //get video from database and patch the details
-    const video = await Video.findByIdAndUpdate(
-        videoId,
-        {
-            $set: {
-                title,
-                description,
-                //update thumbnail if provided
-                ...(thumbnailLocalPath && { thumbnail: thumbnail.url })
-            }
-        },
-        { new: true }
-    );
+     // Check and toggle publish status if needed
+     const published = status === "public"
+     if(published!==video.isPublished){
+        video.isPublished = published;
+     }
 
-    //check if video is updated
-    if(!video){
-        throw new ApiError(500, "Error updating video")
+    // Update other fields
+    video.title = title || video.title;
+    video.description = description || video.description;
+    if (thumbnail) {
+        video.thumbnail = thumbnail.url;
     }
+
+    // Save the updated video
+    await video.save();
 
     //return success response
     res.status(200).json(new ApiResponse(200, video, "Video updated successfully"));

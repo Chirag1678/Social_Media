@@ -33,7 +33,10 @@ const Profile = () => {
         const channelData = await getUserChannel(profile);
         setChannel(channelData.data);
         const videos = await allVideos();
-        const filteredVideos = videos.data.docs.filter((video) => video.owner[0].username === profile);
+        let filteredVideos = videos.data.docs.filter((video) => video.owner[0].username === profile);
+        if(!userChannel){
+          filteredVideos = filteredVideos.filter((video)=> video.isPublished ===true);
+        }
         setFilteredVideos(filteredVideos.length);
         dispatch(setVideos(filteredVideos));
         // const playlists = await getUserPlaylists(channelData.data._id);
@@ -45,7 +48,7 @@ const Profile = () => {
       }
     };
     fetchChannel();
-  }, [profile, dispatch]);
+  }, [profile, dispatch, userChannel]);
   // console.log(channel);
   const toggleSubscribe = async () => {
     try {

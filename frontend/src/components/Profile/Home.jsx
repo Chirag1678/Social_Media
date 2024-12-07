@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
 import { VideoCard } from "../index.js";
 import { createVideo, deleteVideo, updateVideo } from "../../utils/Video.js";
-import {Button, Input, TextArea} from "../index"
+import {Button, Input, TextArea, Select} from "../index"
 
 const Home = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -21,6 +21,7 @@ const Home = () => {
     try {
       const response = await createVideo(data);
       console.log("Video created successfully:", response);
+      setFilteredVideos((prev) => [...prev, response.data]);
       alert("Video uploaded successfully!");
       document.querySelector("form").reset();
       closeModal();
@@ -77,7 +78,7 @@ const Home = () => {
     }
   }
   const isError = isSubmitted && Object.keys(errors).length > 0;
-  console.log(filteredvideos);
+//   console.log(filteredvideos);
   const openModal = () => setIsModalOpen(true); // Open modal
   const closeModal = () => setIsModalOpen(false); // Close modal
   return (
@@ -140,20 +141,14 @@ const Home = () => {
                 {errors.thumbnail && (
                 <p className="text-red-500 text-sm">Thumbnail is required</p>
                 )}
+                <Select label="Status: " defaultValue="public" {...register("status", { 
+                    required: true 
+                })}>
+                    <option value="public">Public</option>
+                    <option value="private">Private</option>
+                </Select>
                 <div className="flex justify-end gap-3 mt-2">
-                  {/* <button
-                    className="py-2 px-4 bg-gray-300 rounded"
-                    onClick={closeModal} // Close modal
-                  >
-                    Cancel
-                  </button> */}
                   <Button bgColor="bg-gray-300" onClick={closeModal}>Cancel</Button>
-                  {/* <button
-                    type="submit"
-                    className="py-2 px-4 bg-blue-500 text-white rounded"
-                  >
-                    Upload
-                  </button> */}
                   <Button type="submit" bgColor="bg-blue-500">Upload</Button>
                 </div>
               </form>

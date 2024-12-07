@@ -14,7 +14,8 @@ const Home = () => {
       try{
         const response = await allVideos();
         // console.log(response.data);
-        setVideos(response.data);
+        const filteredVideos = response.data.docs.filter((video)=> video.isPublished===true);
+        setVideos(filteredVideos);
         if(user){
           const playlists = await getUserPlaylists(user.data?._id);
           // console.log(playlists);
@@ -35,7 +36,7 @@ const Home = () => {
         const verify = confirm("Are you sure you want to delete");
         if(verify){
             const response = await deleteVideo(videoId);
-            setVideos((prev) => prev.docs.filter((vid) => vid._id !== videoId));
+            setVideos((prev) => prev.filter((vid) => vid._id !== videoId));
             console.log("Video deleted successfully",response);
             alert("Video deleted successfully");
             return true;
@@ -58,7 +59,7 @@ const Home = () => {
 
         // Update the filteredVideos state
         setVideos((prevVideos) =>
-            prevVideos.docs.map((video) =>
+            prevVideos.map((video) =>
               video._id === videoId
                 ? {
                     ...video,
@@ -78,7 +79,7 @@ const Home = () => {
   // console.log(videos.docs);
   return (
     <div className="w-full max-w-7xl mx-auto md:px-5 px-4 py-10 min-h-screen flex flex-wrap gap-16">
-    {videos.docs && videos.docs.map((video) => (
+    {videos && videos.map((video) => (
       // <div key={video._id}>
       //   <h1>{video.title}</h1>
       //   <p>{video.description}</p>

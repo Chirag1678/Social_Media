@@ -44,6 +44,7 @@ const createVideo = async (data) => {
     const formData = new FormData();
     formData.append('title', data.title);
     formData.append('description', data.description);
+    formData.append('status', data.status);
     formData.append('videoFile', data.videoFile[0]);
     formData.append('thumbnail', data.thumbnail[0]);
     const response = await axios.post('/api/v1/videos', formData, {
@@ -78,6 +79,7 @@ const updateVideo = async (data,videoId) => {
     if(data.description){
       formData.append('description', data.description);
     }
+    formData.append('status', data.status);
     if(data.thumbnail && data.thumbnail.length > 0){
       formData.append('thumbnail',data.thumbnail[0]);
     }

@@ -7,7 +7,7 @@ import { BsThreeDotsVertical } from 'react-icons/bs';
 import { CiBookmark, CiEdit, CiFlag1, CiSquareRemove } from "react-icons/ci";
 import { useSelector } from 'react-redux';
 import { addVideoToPlaylist, removeVideoFromPlaylist, getPlaylistById } from '../../utils/Playlist';
-import { Button, Input, TextArea } from '../index';
+import { Button, Input, Select, TextArea } from '../index';
 import { useForm } from 'react-hook-form';
 
 function VideoCard({ video, onDelete, onUpdate }) {
@@ -16,7 +16,7 @@ function VideoCard({ video, onDelete, onUpdate }) {
   const [VideoModalOpen, setVideoModalOpen] = useState(false);
   const [playlists, setPlaylists] = useState([]);
   const [isError, setIsError] = useState(false);
-  const formData = new FormData();
+  const published = video.isPublished ===true;
 
   const playlistsData = useSelector((state) => state.playlist.playlists);
   const loggedInUser = useSelector((state) => state.auth.user);
@@ -196,7 +196,7 @@ function VideoCard({ video, onDelete, onUpdate }) {
                 {/* Common Error Message */}
                 {isError && (
                   <p className="text-red-500 text-sm font-bold">
-                    At least one field must be updated. Please provide a title, description, or thumbnail.
+                    At least one field must be updated. Please provide a title, description, thumbnail, or status.
                   </p>
                 )}
 
@@ -221,6 +221,10 @@ function VideoCard({ video, onDelete, onUpdate }) {
                   type="file" accept="image/*" name="thumbnail"
                   {...register("thumbnail")}
                 />
+                <Select label="Status: " defaultValue={published ?'public':'private'} {...register("status")}>
+                    <option value="public">Public</option>
+                    <option value="private">Private</option>
+                </Select>
                 <div className="flex justify-end gap-3 mt-2">
                   <Button bgColor="bg-gray-300" onClick={toggleVideoModal}>Cancel</Button>
                   <Button type="submit" bgColor="bg-blue-500">Update Video</Button>
