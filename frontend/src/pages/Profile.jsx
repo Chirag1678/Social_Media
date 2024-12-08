@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getUserChannel } from "../utils/User.js";
 import { format } from "date-fns";
@@ -27,10 +27,12 @@ const Profile = () => {
   const [activeTab, setActiveTab] = useState("home");
   const [filteredVideos, setFilteredVideos] = useState(0);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchChannel = async () => {
       try {
         const channelData = await getUserChannel(profile);
+        // console.log(channelData);
         setChannel(channelData.data);
         const videos = await allVideos();
         let filteredVideos = videos.data.docs.filter((video) => video.owner[0].username === profile);
@@ -87,8 +89,11 @@ const Profile = () => {
   };
   return (
     <div className="px-4 py-10 min-h-screen bg-black">
+      <div className="h-[20vh] w-full bg-red-500 rounded-2xl mb-5 overflow-hidden flex items-center justify-center">
+        <img src={channel.coverImage} alt={`current user ${channel.username}`}/>
+      </div>
       <div className="flex w-full items-center gap-4">
-        <div className="w-40 h-40 rounded-full flex items-center justify-center overflow-hidden">
+        <div className="w-40 h-40 rounded-full overflow-hidden flex items-center justify-center">
           <img src={channel.avatar} alt={`current user ${channel.username}`} />
         </div>
         <div>
@@ -100,7 +105,7 @@ const Profile = () => {
           </div>
           <p>Joined {formattedDate}</p>
           {userChannel && <div className="flex items-center gap-3">
-            <button>Customize channel</button>
+            <button onClick={()=>navigate(`/channel/${channel.username}`)}>Customize channel</button>
             <button>Manage videos</button>
           </div>}
           {!userChannel && <div>

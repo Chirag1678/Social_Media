@@ -35,6 +35,7 @@ const Header = () => {
   };
 
   const handleProfileClick = () => {
+    setMenuOpen(false);
     navigate(`/c/${currentUser.username}`); // Navigate to the profile page
   };
 

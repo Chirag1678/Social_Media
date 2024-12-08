@@ -88,4 +88,63 @@ const getUserChannel = async (userName) => {
     }
 }
 
-export { currentUser, logoutUser, loginUser, signUpUser, getUserChannel };
+const updateUserAvatar = async (file) => {
+    const formData = new FormData();
+    formData.append('avatar', file);
+    try {
+        const response = await axios.patch('/api/v1/users/update-avatar', formData, {
+            headers: {
+                "Content-Type": 'multipart/form-data'
+            },
+            withCredentials: true
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error updating user avatar:", error);
+        throw error;
+    }
+}
+
+const updateUserCoverImage = async (file) => {
+    const formData = new FormData();
+    formData.append('coverImage', file);
+    try {
+        const response = await axios.patch('/api/v1/users/update-cover-image', formData, {
+            headers: {
+                "Content-Type": 'multipart/form-data'
+            },
+            withCredentials: true
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error updating user cover image:', error);
+        throw error;
+    }
+}
+
+const updateAccountDetails = async (data) => {
+    const formData = new FormData();
+    if(data.username){
+        formData.append('username', data.username);
+    }
+    if(data.fullName){
+        formData.append('fullName', data.fullName);
+    }
+    if(data.description){
+        formData.append('description', data.description);
+    }
+    if(data.email){
+        formData.append('email', data.email);
+    }
+    try {
+        const response = await axios.patch('/api/v1/users/update-profile', formData, {
+            withCredentials: true
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error updating account details:", error);
+        throw error;
+    }
+}
+
+export { currentUser, logoutUser, loginUser, signUpUser, getUserChannel, updateUserAvatar, updateUserCoverImage, updateAccountDetails };

@@ -232,10 +232,10 @@ const getCurrentuser = asyncHandler(async (req,res) => {
 });
 
 const updateAccountDetails = asyncHandler(async (req,res) => {
-    const {fullName, email, username}=req.body; //get user details from frontend
+    const {fullName, email, username, description}=req.body; //get user details from frontend
 
     //if user details are not provided, throw an error
-    if(!(fullName || email || username)) throw new ApiError(400, "Nothing to update");
+    if(!(fullName || email || username || description)) throw new ApiError(400, "Nothing to update");
 
     //check if username or email already exists
     const existing = await User.findOne({
@@ -249,7 +249,7 @@ const updateAccountDetails = asyncHandler(async (req,res) => {
     //find user by id and update the details
     const user = await User.findByIdAndUpdate(
         req.user?._id, //find user by id
-        {fullName, email, username}, //update the user details
+        {fullName, email, username, description}, //update the user details
         {new: true} //return the updated user
     ).select("-password -refreshToken"); //select is used to select the fields to be returned, -password is used to not return the password field, -refreshToken is used to not return the refreshToken field
 

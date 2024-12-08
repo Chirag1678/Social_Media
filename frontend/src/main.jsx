@@ -14,6 +14,7 @@ import Profile from './pages/Profile.jsx'
 import PlaylistPage from './pages/PlaylistPage.jsx'
 import TweetPage from './pages/TweetPage.jsx'
 import SearchResult from './pages/SearchResult.jsx'
+import Channel from './pages/Channel.jsx'
 
 const router = createBrowserRouter([
   {
@@ -62,6 +63,12 @@ const router = createBrowserRouter([
         path: "/tweet/:tweetId",
         element: (
           <TweetPage />
+        )
+      },
+      {
+        path: "/channel/:profile",
+        element: (
+          <Channel />
         )
       },
       {
