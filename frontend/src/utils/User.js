@@ -123,22 +123,12 @@ const updateUserCoverImage = async (file) => {
 }
 
 const updateAccountDetails = async (data) => {
-    const formData = new FormData();
-    if(data.username){
-        formData.append('username', data.username);
-    }
-    if(data.fullName){
-        formData.append('fullName', data.fullName);
-    }
-    if(data.description){
-        formData.append('description', data.description);
-    }
-    if(data.email){
-        formData.append('email', data.email);
-    }
     try {
-        const response = await axios.patch('/api/v1/users/update-profile', formData, {
-            withCredentials: true
+        const response = await axios.patch('/api/v1/users/update-profile', data, {
+            withCredentials: true,
+            headers: {
+                'Content-Type': 'application/json'
+            }
         });
         return response.data;
     } catch (error) {

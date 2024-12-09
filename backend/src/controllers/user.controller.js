@@ -233,7 +233,6 @@ const getCurrentuser = asyncHandler(async (req,res) => {
 
 const updateAccountDetails = asyncHandler(async (req,res) => {
     const {fullName, email, username, description}=req.body; //get user details from frontend
-
     //if user details are not provided, throw an error
     if(!(fullName || email || username || description)) throw new ApiError(400, "Nothing to update");
 
