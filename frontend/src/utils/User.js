@@ -137,4 +137,35 @@ const updateAccountDetails = async (data) => {
     }
 }
 
-export { currentUser, logoutUser, loginUser, signUpUser, getUserChannel, updateUserAvatar, updateUserCoverImage, updateAccountDetails };
+const getPassword = async () => {
+    try {
+        const response = await axios.get('/api/v1/users/get-password', {
+
+            withCredentials: true
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching user password:", error);
+        throw error;
+    }
+}
+
+const updatePassword = async (data) => {
+    const formData = new FormData();
+    formData.append('currentPassword', data.currentPassword);
+    formData.append('newPassword', data.newPassword);
+    try {
+        const response = await axios.post('/api/v1/users/change-password', formData, {
+            withCredentials: true,
+            headers: {
+                "Content-Type": 'application/json'
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error updating password:", error);
+        throw error;
+    }
+}
+
+export { currentUser, logoutUser, loginUser, signUpUser, getUserChannel, updateUserAvatar, updateUserCoverImage, updateAccountDetails, getPassword, updatePassword };

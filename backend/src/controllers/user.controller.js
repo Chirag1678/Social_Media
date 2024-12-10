@@ -439,4 +439,15 @@ const getWatchHistory = asyncHandler(async (req,res) => {
     res.status(200).json(new ApiResponse(200, user[0].watchHistory, "Watch history found successfully"));
 });
 
-export { registerUser, loginUser, logoutUser, refreshAccessToken, changeCurrentPassword, getCurrentuser, updateAccountDetails, updateUserAvatar, updateUserCoverImage, getUserChannel, getWatchHistory }; //export the functions to be used in routes
+const getPassword = asyncHandler(async (req,res) => {
+    // Get user from request (set by auth middleware)
+    const user = await User.findById(req.user?._id).select("password");
+
+    // If user is not found, throw error
+    if(!user) throw new ApiError(404, "User not found");
+
+    // Send response to frontend
+    res.status(200).json(new ApiResponse(200, { password: user.password },"Password retrieved successfully"));
+});
+
+export { registerUser, loginUser, logoutUser, refreshAccessToken, changeCurrentPassword, getCurrentuser, updateAccountDetails, updateUserAvatar, updateUserCoverImage, getUserChannel, getWatchHistory, getPassword }; //export the functions to be used in routes
