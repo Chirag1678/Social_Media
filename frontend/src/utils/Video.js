@@ -96,4 +96,16 @@ const updateVideo = async (data,videoId) => {
   }
 }
 
-export { allVideos, getVideoById, createVideo, deleteVideo, updateVideo };
+const toggleVideoStatus = async (videoId) => {
+  try {
+    const response = await axios.patch(`/api/v1/videos/toggle/publish-status/${videoId}`, {
+      withCredentials: true
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Video status cannot be changed:", error);
+    throw error;
+  }
+}
+
+export { allVideos, getVideoById, createVideo, deleteVideo, updateVideo, toggleVideoStatus };

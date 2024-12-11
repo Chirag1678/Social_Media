@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
 import { VideoCard } from "../index.js";
-import { createVideo, deleteVideo, updateVideo } from "../../utils/Video.js";
+import { createVideo, deleteVideo, toggleVideoStatus, updateVideo } from "../../utils/Video.js";
 import {Button, Input, TextArea, Select} from "../index"
 
 const Home = () => {
@@ -31,9 +31,8 @@ const Home = () => {
     }
   };
 
-  const videoDeletion = async (event,videoId) => {
+  const videoDeletion = async (videoId) => {
     try {
-        event.stopPropagation();
         const verify = confirm("Are you sure you want to delete");
         if(verify){
             const response = await deleteVideo(videoId);
@@ -77,6 +76,30 @@ const Home = () => {
         alert("Failed to update video. Please try again.");
     }
   }
+
+  const videoToggle = async (videoId) => {
+    try {
+      const response = await toggleVideoStatus(videoId);
+      console.log("Video toggled successfully", response);
+
+      // Update the filteredVideos state
+      setFilteredVideos((prevVideos) =>
+        prevVideos.map((video) =>
+          video._id === videoId
+            ? {
+                ...video,
+                isPublished: response.data?.isPublished || video.isPublished
+              }
+            : video
+          )
+      );
+      alert("Video toggled successfully");
+    } catch (error) {
+      console.error("Error in video toggle:", error);
+      alert("Failed to toggle video, please try again.");
+    }
+  }
+
   const isError = isSubmitted && Object.keys(errors).length > 0;
 //   console.log(filteredvideos);
   const openModal = () => setIsModalOpen(true); // Open modal
@@ -96,7 +119,7 @@ const Home = () => {
       </div>}
       {filteredvideos && <div className="flex gap-16">
         {filteredvideos.map((video) => (
-          <VideoCard key={video._id} video={video} onDelete={event =>videoDeletion(event,video._id)} onUpdate={videoUpdation}/>
+          <VideoCard key={video._id} video={video} onDelete={()=>videoDeletion(video._id)} onUpdate={videoUpdation} onToggle={()=>videoToggle(video._id)}/>
         ))}
       </div>}
       <div className="text-center">

@@ -168,4 +168,16 @@ const updatePassword = async (data) => {
     }
 }
 
-export { currentUser, logoutUser, loginUser, signUpUser, getUserChannel, updateUserAvatar, updateUserCoverImage, updateAccountDetails, getPassword, updatePassword };
+const userWatchHistory = async () => {
+    try {
+        const response = await axios.get('/api/v1/users/history', {
+            withCredentials: true
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching user history: ", error);
+        throw error;
+    }
+}
+
+export { currentUser, logoutUser, loginUser, signUpUser, getUserChannel, updateUserAvatar, updateUserCoverImage, updateAccountDetails, getPassword, updatePassword, userWatchHistory };

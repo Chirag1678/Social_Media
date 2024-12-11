@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux'
 import { login, logout } from './store/authSlice';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Header } from './components';
 import { currentUser } from './utils/User.js';
 
@@ -57,11 +57,8 @@ function App() {
   },[dispatch, navigate]);
   // if(loading) return null;
   return (
-    <div className="bg-black w-full text-white">
+    <div className="bg-black w-full text-white ">
       <Header />
-      <main>
-        <Outlet />
-      </main>
     </div>
   )
 }

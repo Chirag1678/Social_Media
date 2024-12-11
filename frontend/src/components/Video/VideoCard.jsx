@@ -9,8 +9,9 @@ import { useSelector } from 'react-redux';
 import { addVideoToPlaylist, removeVideoFromPlaylist, getPlaylistById } from '../../utils/Playlist';
 import { Button, Input, Select, TextArea } from '../index';
 import { useForm } from 'react-hook-form';
+import { MdVisibility, MdVisibilityOff } from 'react-icons/md';
 
-function VideoCard({ video, onDelete, onUpdate }) {
+function VideoCard({ video, onDelete, onUpdate, onToggle }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [playlistModalOpen, setPlaylistModalOpen] = useState(false);
   const [VideoModalOpen, setVideoModalOpen] = useState(false);
@@ -117,19 +118,23 @@ function VideoCard({ video, onDelete, onUpdate }) {
     }
     setIsError(false);
 
-    // Proceed with the update logic
-    // console.log("Update data:", data);
-    // alert("Video updated successfully!");
-    // console.log(data);
     await onUpdate(data,video._id);
     toggleVideoModal();
   };
+  const handleDelete = async () => {
+    await onDelete();
+    setModalOpen(false);
+  };
+  const handleToggle = async () => {
+    await onToggle();
+    setModalOpen(false);
+  }
   const [isPlaying, setIsPlaying] = useState(false);
   const channel = video.owner[0];
   const userChannel = channel._id === loggedInUser?.data._id;
   return (
     <>
-    <div className="w-[27%] h-[35vh]" onClick={handleCardClick}>
+    <div className="w-[30%] h-[35vh]" onClick={handleCardClick}>
       <div className="w-full relative h-[70%] rounded-3xl overflow-hidden" onMouseEnter={() => setIsPlaying(true)} onMouseLeave={() => setIsPlaying(false)}>
         {!isPlaying && <img src={video.thumbnail} alt={video.title} className='absolute w-full h-full'/>}
         <ReactPlayer 
@@ -157,14 +162,17 @@ function VideoCard({ video, onDelete, onUpdate }) {
         </div>
         <div className='relative'>
           <button onClick={toggleModal}><BsThreeDotsVertical /></button>
-          {modalOpen && <div className='absolute bg-slate-800 w-[20vw] rounded-xl text-white'>
+          {modalOpen && <div className='absolute bg-slate-800 w-[20vw] rounded-xl text-white' onClick={e=>e.stopPropagation()}>
             <button className='m-5 flex items-center gap-3' onClick={togglePlaylistModal}><span><CiBookmark className='text-2xl'/></span>Save to playlist</button>
             <hr />
             <button className='m-5 flex items-center gap-3'><span><CiFlag1 className='text-2xl'/></span>Report</button>
             {userChannel && <><hr />
             <button className='m-5 flex items-center gap-3' onClick={toggleVideoModal}><span><CiEdit className='text-2xl'/></span>Edit</button>
             <hr />
-            <button className='m-5 flex items-center gap-3' onClick={onDelete}><span><CiSquareRemove className='text-2xl'/></span>Delete</button></>}
+            <button className='m-5 flex items-center gap-3' onClick={()=>handleDelete()}><span><CiSquareRemove className='text-2xl'/></span>Delete</button>
+            <hr />
+            <button className='m-5 flex items-center gap-3' onClick={()=>handleToggle()}><span>{published?<MdVisibilityOff className='text-2xl' />:<MdVisibility className='text-2xl'/>}</span>Make video {published?"Private":"Public"}</button>
+            </>}
           </div>}
         </div>
       </div>
