@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button, Input, TweetCard } from "../index";
-import { createTweet } from "../../utils/Tweet";
+import { createTweet, deleteTweet, updateTweet } from "../../utils/Tweet";
 import { useSelector } from "react-redux";
 const Tweets = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -21,17 +21,53 @@ const Tweets = () => {
   const tweetCreation = async (data) => {
     // Placeholder for tweet creation logic (API call or state update)
     try {
-        const response = await createTweet(data);
-        // console.log(data);
-        console.log("Tweet created successfully:", response);
-        alert("Tweet created successfully!");
-        document.querySelector("form").reset();
-        closeModal();
+      const response = await createTweet(data);
+      // console.log(data);
+      console.log("Tweet created successfully:", response);
+      alert("Tweet created successfully!");
+      document.querySelector("form").reset();
+      closeModal();
     } catch (error) {
-        console.error("Error creating tweet:", error);
-        alert("Failed to create tweet. Please try again.");
+      console.error("Error creating tweet:", error);
+      alert("Failed to create tweet. Please try again.");
     }
   };
+
+  const tweetDeletion = async (tweetId) => {
+    try {
+      const response = await deleteTweet(tweetId);
+      console.log("Tweet deleted successfully:", response);
+      setTweets((prev)=> prev.filter(tweet => tweet._id !== tweetId));
+      alert("Tweet deleted successfully");
+    } catch (error) {
+      console.error("Error deleting tweet: ", error);
+      alert("Failed to delete tweet. Please try again.");
+    }
+  }
+
+  const tweetUpdation = async (data,tweetId) => {
+    try {
+      // console.log(data.content, tweetId);
+      const response = await updateTweet(data, tweetId);
+      console.log("Tweet updated successfully:", response);
+
+      setTweets((prevTweets) =>
+        prevTweets.map((tweet) => 
+          tweet._id === tweetId
+          ? {
+              ...tweet,
+              content: data.content || tweet.content,
+              image: response.data?.image || tweet.image,
+            }
+          : tweet
+        ) 
+      );
+      alert("Tweet updated successfully");
+    } catch (error) {
+      console.error("Error updating tweet: ", error);
+      alert("Failed to update tweet. Please try again.");
+    }
+  }
 
   const isError = isSubmitted && Object.keys(errors).length > 0;
 
@@ -48,7 +84,7 @@ const Tweets = () => {
             // <div key={tweet._id}>
             //     <h2>{tweet.content}</h2>
             // </div>
-            <TweetCard key={tweet._id} tweet={tweet}/>
+            <TweetCard key={tweet._id} tweet={tweet} onDelete={()=>tweetDeletion(tweet._id)} onUpdate={tweetUpdation}/>
         ))}
       </div>}
       <div>

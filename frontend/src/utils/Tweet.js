@@ -40,4 +40,36 @@ const getTweetById = async (tweetId) => {
     }
 }
 
-export { createTweet, getUserTweets, getTweetById };
+const deleteTweet = async (tweetId) => {
+    try {
+        const response = await axios.delete(`/api/v1/tweets/${tweetId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error deleting tweet:', error);
+        throw error;
+    }
+}
+
+const updateTweet = async (data,tweetId) => {
+    try {
+        const formData = new FormData();
+        if(data.content){
+            formData.append('content', data.content);
+        }
+        if(data.image && data.image.length > 0){
+            formData.append('image', data.image[0]);
+        }
+        const response = await axios.patch(`/api/v1/tweets/${tweetId}`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            },
+            withCredentials: true
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error updating tweet:", error);
+        throw error;
+    }
+}
+
+export { createTweet, getUserTweets, getTweetById, deleteTweet, updateTweet };

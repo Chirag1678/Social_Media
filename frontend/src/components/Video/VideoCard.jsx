@@ -162,7 +162,7 @@ function VideoCard({ video, onDelete, onUpdate, onToggle }) {
         </div>
         <div className='relative'>
           <button onClick={toggleModal}><BsThreeDotsVertical /></button>
-          {modalOpen && <div className='absolute bg-slate-800 w-[20vw] rounded-xl text-white' onClick={e=>e.stopPropagation()}>
+          {modalOpen && <div className='absolute right-0 bg-slate-800 w-[20vw] rounded-xl text-white' onClick={e=>e.stopPropagation()}>
             <button className='m-5 flex items-center gap-3' onClick={togglePlaylistModal}><span><CiBookmark className='text-2xl'/></span>Save to playlist</button>
             <hr />
             <button className='m-5 flex items-center gap-3'><span><CiFlag1 className='text-2xl'/></span>Report</button>
