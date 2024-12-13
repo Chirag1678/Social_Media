@@ -16,6 +16,7 @@ import TweetPage from './pages/TweetPage.jsx'
 import SearchResult from './pages/SearchResult.jsx'
 import Channel from './pages/Channel.jsx'
 import History from './pages/History.jsx'
+import Subscribed from './pages/Subscribed.jsx'
 
 const router = createBrowserRouter([
   {
@@ -82,6 +83,12 @@ const router = createBrowserRouter([
         path: "/history",
         element: (
           <History />
+        )
+      },
+      {
+        path: "/subscribed",
+        element: (
+          <Subscribed />
         )
       }
     ]

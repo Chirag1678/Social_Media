@@ -14,7 +14,7 @@ const Header = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [navBar, setNavBar] = useState(false);
+  const [navBar, setNavBar] = useState(true);
   const [selectedPage, setSelectedPage] = useState('home');
 
   const { register, handleSubmit, reset } = useForm();
@@ -124,7 +124,7 @@ const Header = () => {
         {navBar && (
           <div className="h-screen w-[20vw] bg-black fixed z-10 py-5 px-6">
             <div onClick={()=> {setSelectedPage('home'); navigate('/');}} className={`w-full flex cursor-pointer items-center gap-5 ${selectedPage === 'home' ? 'bg-gray-700' : ''} hover:bg-gray-700 py-2 px-3 rounded-xl mb-1`}>Home</div>
-            <div onClick={()=> {setSelectedPage('subscriptions'); navigate('/');}} className={`w-full flex cursor-pointer items-center gap-5 ${selectedPage === 'subscriptions' ? 'bg-gray-700' : ''} hover:bg-gray-700 py-2 px-3 rounded-xl mb-1`}>Subscriptions</div>
+            <div onClick={()=> {setSelectedPage('subscriptions'); navigate('/subscribed');}} className={`w-full flex cursor-pointer items-center gap-5 ${selectedPage === 'subscriptions' ? 'bg-gray-700' : ''} hover:bg-gray-700 py-2 px-3 rounded-xl mb-1`}>Subscriptions</div>
             <hr />
             <div className="mt-3">You</div>
             <div onClick={()=> {setSelectedPage("history"); navigate('/history');}} className={`w-full flex cursor-pointer items-center gap-5 ${selectedPage==='history'?'bg-gray-700': ''} hover:bg-gray-700 py-2 px-3 rounded-xl mb-1`}>History</div>

@@ -14,6 +14,16 @@ const createPlaylist = async (title,description) => {
     }
 }
 
+const deletePlaylist = async (playlistId) => {
+    try {
+        const response = await axios.delete(`/api/v1/playlist/${playlistId}`);
+        return response.data;
+    } catch (error) {
+        console.error("'Error deleting playlist:", error);
+        throw error;
+    }
+};
+
 const getUserPlaylists = async (userId) => {
     try {
         const response = await axios.get(`/api/v1/playlist/user/${userId}`);
@@ -60,4 +70,4 @@ const removeVideoFromPlaylist = async (playlistId,videoId) => {
     }
 }
 
-export { createPlaylist, getUserPlaylists, getPlaylistById, addVideoToPlaylist, removeVideoFromPlaylist };
+export { createPlaylist, deletePlaylist, getUserPlaylists, getPlaylistById, addVideoToPlaylist, removeVideoFromPlaylist };

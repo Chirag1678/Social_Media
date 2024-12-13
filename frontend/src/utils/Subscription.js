@@ -19,4 +19,15 @@ const channelSubscribers = async (channelId) => {
         throw error;
     }
 }
-export { toggleSubscribtion, channelSubscribers };
+
+const getSubscribedChannels = async () => {
+    try {
+        const response = await axios.get('/api/v1/subscriptions/subscribed');
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching subscribed channels:", error);
+        throw error;
+    }
+};
+
+export { toggleSubscribtion, channelSubscribers, getSubscribedChannels };

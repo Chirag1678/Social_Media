@@ -110,7 +110,9 @@ const getSubscribedChannels = asyncHandler(async (req, res) => {
             $project: {
                 "channel._id": 1,
                 "channel.username": 1,
-                "channel.email": 1
+                "channel.fullName": 1,
+                "channel.avatar": 1,
+                "channel.description": 1,
             }
         }
     ]);
