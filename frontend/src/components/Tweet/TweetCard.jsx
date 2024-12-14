@@ -19,7 +19,7 @@ const TweetCard = ({tweet, onDelete, onUpdate}) => {
 
   const loggedInUser = useSelector((state) => state.auth.user);
   const navigate = useNavigate();
-  const { register, handleSubmit, formState: { errors }  } = useForm();
+  const { register, handleSubmit } = useForm();
   useEffect(()=>{
     const liked = async () => {
         try {
@@ -96,7 +96,7 @@ const TweetCard = ({tweet, onDelete, onUpdate}) => {
     setTweetModalOpen(!tweetModalOpen);
   }
   const handleUpdate = async (data) => {
-    if(!data.content && !data.image?.length){
+    if(data.content===tweet.content && !data.image?.length){
       setIsError(true);
       return;
     }

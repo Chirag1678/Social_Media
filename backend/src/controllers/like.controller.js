@@ -147,11 +147,24 @@ const getLikedVideos = asyncHandler(async (req, res) => {
             $unwind: "$video"
         },
         {
+            $lookup: {
+                from: "users",
+                localField: "video.owner",
+                foreignField: "_id",
+                as: "video.owner"
+            }
+        },
+        {
             $project: {
-                "video.videoFile": 1,
-                "video.title": 1,
-                "video.description": 1,
-                "video.thumbnail": 1,
+                _id: "$video._id",
+                videoFile: "$video.videoFile",
+                title: "$video.title",
+                description: "$video.description",
+                thumbnail: "$video.thumbnail",
+                owner: "$video.owner",
+                views: "$video.views",
+                createdAt: "$video.createdAt",
+                isPublished: "$video.isPublished"
             }
         },
     ]);

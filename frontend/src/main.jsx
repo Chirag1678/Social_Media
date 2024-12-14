@@ -17,6 +17,7 @@ import SearchResult from './pages/SearchResult.jsx'
 import Channel from './pages/Channel.jsx'
 import History from './pages/History.jsx'
 import Subscribed from './pages/Subscribed.jsx'
+import LikedVideos from './pages/LikedVideos.jsx'
 
 const router = createBrowserRouter([
   {
@@ -89,6 +90,12 @@ const router = createBrowserRouter([
         path: "/subscribed",
         element: (
           <Subscribed />
+        )
+      },
+      {
+        path: "/liked",
+        element: (
+          <LikedVideos />
         )
       }
     ]

@@ -130,7 +130,7 @@ const Header = () => {
             <div onClick={()=> {setSelectedPage("history"); navigate('/history');}} className={`w-full flex cursor-pointer items-center gap-5 ${selectedPage==='history'?'bg-gray-700': ''} hover:bg-gray-700 py-2 px-3 rounded-xl mb-1`}>History</div>
             <div onClick={()=> {setSelectedPage("playlists"); navigate('/');}} className={`w-full flex cursor-pointer items-center gap-5 ${selectedPage==='playlists'?'bg-gray-700': ''} hover:bg-gray-700 py-2 px-3 rounded-xl mb-1`}>Playlists</div>
             <div onClick={()=> {setSelectedPage("your-videos"); navigate('/');}} className={`w-full flex cursor-pointer items-center gap-5 ${selectedPage==='your-videos'?'bg-gray-700': ''} hover:bg-gray-700 py-2 px-3 rounded-xl mb-1`}>Your videos</div>
-            <div onClick={()=> {setSelectedPage("liked-videos"); navigate('/');}} className={`w-full flex cursor-pointer items-center gap-5 ${selectedPage==='liked-videos'?'bg-gray-700': ''} hover:bg-gray-700 py-2 px-3 rounded-xl mb-1`}>Liked videos</div>
+            <div onClick={()=> {setSelectedPage("liked-videos"); navigate('/liked');}} className={`w-full flex cursor-pointer items-center gap-5 ${selectedPage==='liked-videos'?'bg-gray-700': ''} hover:bg-gray-700 py-2 px-3 rounded-xl mb-1`}>Liked videos</div>
             <hr />
           </div>
         )}

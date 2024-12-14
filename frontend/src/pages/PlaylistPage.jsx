@@ -1,26 +1,30 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { deletePlaylist, getPlaylistById } from "../utils/Playlist";
+import { deletePlaylist, getPlaylistById, updatePlaylist } from "../utils/Playlist";
 import { FaPlay } from "react-icons/fa";
 import { FiPlus } from "react-icons/fi";
 import { BsPencil } from "react-icons/bs";
 import { FaShare } from "react-icons/fa";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { MdOutlineSort } from "react-icons/md";
-import { Button } from "../components";
+import { Button, Input, TextArea } from "../components";
 import { CiEdit, CiFlag1, CiSquareRemove } from "react-icons/ci";
 import { useSelector } from "react-redux";
+import { useForm } from "react-hook-form";
 
 
 const PlaylistPage = () => {
-  const navigate=useNavigate();
   const { playlistId } = useParams();
   const [playlist, setPlaylist] = useState(null);
   const [owner, setOwner] = useState(null);
   const [views, setViews] = useState(0);
   const [playlistModalOpen, setPlaylistModalOpen] = useState(false);
-
+  const [updationModal, setUpdationModal] = useState(false);
+  const [isError, setIsError] = useState(false);
+  
   const loggedInUser = useSelector((state) => state.auth.user);
+  const navigate=useNavigate();
+  const { register, handleSubmit } = useForm();
 
   useEffect(() => {
     const fetchPlaylist = async () => {
@@ -62,11 +66,40 @@ const PlaylistPage = () => {
     }
   }
 
+  const playlistUpdation = async (data) => {
+    if(data.name === playlist.name && data.description === playlist.description){
+      setIsError(true);
+      return;
+    }
+    setIsError(false);
+
+    try {
+      const response = await updatePlaylist(playlist._id, data);
+      console.log("Playlist updated successfully", response);
+      setPlaylist(prev => ({
+        ...prev,
+        name: data.name || prev.name,
+        description: data.description || prev.description
+      }));
+      alert('Playlist updated successfully');
+      toggleUpdationModal();
+    } catch (error) {
+      console.error('Error updating playlist:', error);
+      alert('Error updating playlist, please try again');
+    }
+  }
+
+  const toggleUpdationModal = () => {
+    setPlaylistModalOpen(false);
+    setUpdationModal(!updationModal);
+  }
+
   const userChannel = owner?._id===loggedInUser?.data?._id;
 
   if (!playlist) return <div>Loading...</div>;
 
   return (
+    <>
     <div className="pl-5 mt-2 bg-black min-h-screen flex justify-between">
       <div className="h-[88vh] w-[28vw] rounded-t-2xl bg-gradient-to-b from-green-900/75 to-black p-5">
         <div className="w-full rounded-xl overflow-hidden bg-white flex items-center justify-center">
@@ -98,7 +131,7 @@ const PlaylistPage = () => {
                 {playlistModalOpen && <div className='absolute bg-slate-800 mt-1 w-[20vw] rounded-xl text-white'>
                   <button className='m-5 flex items-center gap-3'><span><CiFlag1 className='text-2xl'/></span>Report</button>
                   {userChannel && <><hr />
-                    <button className='m-5 flex items-center gap-3'><span><CiEdit className='text-2xl'/></span>Edit</button>
+                    <button onClick={()=>toggleUpdationModal()} className='m-5 flex items-center gap-3'><span><CiEdit className='text-2xl'/></span>Edit</button>
                     <hr />
                     <button onClick={()=>playlistDeletion(playlistId)} className='m-5 flex items-center gap-3'><span><CiSquareRemove className='text-2xl'/></span>Delete</button>
                   </>}
@@ -123,6 +156,30 @@ const PlaylistPage = () => {
         ))}
       </div>
     </div>
+    {updationModal && <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-[#71797E] rounded-3xl w-[70vw] h-[80vh]">
+        <h2 className="text-xl font-semibold py-4 px-6">Update Playlist</h2>
+        <hr />
+        <h2 className="font-medium text-2xl mt-3 px-6">Details</h2>
+        <div className="px-6">
+          <form onSubmit={handleSubmit(playlistUpdation)}>
+            {/* Common Error Message */}
+            {isError && (
+              <p className="text-red-500 text-sm font-bold">
+                At least one field must be updated. Please provide at least one of the name or description.
+              </p>
+            )}
+            <Input label="Name: " placeholder="Enter your playlist name: " type="text" name="name" {...register('name', {value:playlist.name})}/>
+            <TextArea label="Description: " placeholder="Enter your playlist description: " name="description" {...register('description', {value:playlist.description})}/>
+            <div className="flex justify-end gap-3 mt-2">
+              <Button bgColor="bg-gray-300" onClick={toggleUpdationModal}>Cancel</Button>
+              <Button type="submit" bgColor="bg-blue-500">Update Playlist</Button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>}
+    </>
   )
 }
 

@@ -24,6 +24,27 @@ const deletePlaylist = async (playlistId) => {
     }
 };
 
+const updatePlaylist = async (playlistId, data) => {
+    const formData = new FormData();
+    if(data.name){
+        formData.append('name', data.name);
+    }
+    if(data.description){
+        formData.append('description', data.description);
+    }
+    try {
+        const response = await axios.patch(`/api/v1/playlist/${playlistId}`, formData, {
+            headers: {
+                "Content-Type": 'application/json'
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error updating playlist:', error);
+        throw error;
+    }
+};
+
 const getUserPlaylists = async (userId) => {
     try {
         const response = await axios.get(`/api/v1/playlist/user/${userId}`);
@@ -70,4 +91,4 @@ const removeVideoFromPlaylist = async (playlistId,videoId) => {
     }
 }
 
-export { createPlaylist, deletePlaylist, getUserPlaylists, getPlaylistById, addVideoToPlaylist, removeVideoFromPlaylist };
+export { createPlaylist, deletePlaylist, updatePlaylist, getUserPlaylists, getPlaylistById, addVideoToPlaylist, removeVideoFromPlaylist };
