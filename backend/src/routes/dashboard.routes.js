@@ -6,7 +6,7 @@ const router = Router();
 router.use(verifyJWT); // Apply verifyJWT middleware to all routes in this file
 
 //secured routes
-router.route("/stats").get(getChannelStats); // Get channel stats like total video views, total subscribers, total videos, total likes etc.
-router.route("/videos").get(getChannelVideos); // Get all the videos uploaded by the channel
+router.route("/stats/:channelId").get(getChannelStats); // Get channel stats like total video views, total subscribers, total videos, total likes etc.
+router.route("/videos/:channelId").get(getChannelVideos); // Get all the videos uploaded by the channel
 
 export default router

@@ -9,34 +9,37 @@ import {asyncHandler} from "../utils/asyncHandler.js"
 const getChannelStats = asyncHandler(async (req, res) => {
     // TODO: Get the channel stats like total video views, total subscribers, total videos, total likes etc.
     // console.log(req.user);
-    const userId = req.user._id;
+    const { channelId } = req.params;
     //check if the user is a valid user
-    if(!mongoose.isValidObjectId(userId)){
-        throw new ApiError(400, "Invalid user id");
+    if(!mongoose.isValidObjectId(channelId)){
+        throw new ApiError(400, "Invalid channel id");
     }
 
     const totalVideos = await Video.aggregate([
         {
             $match: {
-                owner: new mongoose.Types.ObjectId(userId)
+                owner: new mongoose.Types.ObjectId(channelId)
             }
         },
         {
-            $addFields: {
-                totalViews: {$sum: "$views"} //sum the total views
+            $group: {
+                _id: null,
+                totalViews: { $sum: { $sum: "$views" } }, // sum the total views
+                totalVideos: { $sum: 1 } // count the total videos
             }
         },
         {
             $project: {
+                _id: 0,
                 totalViews: 1,
-                totalVideos: {$sum: 1} //count the total videos
+                totalVideos: 1
             }
         }
     ]);
     const totalSubscribers = await Subscription.aggregate([
         {
             $match: {
-                channel: new mongoose.Types.ObjectId(userId)
+                channel: new mongoose.Types.ObjectId(channelId)
             }
         },
         {
@@ -48,10 +51,12 @@ const getChannelStats = asyncHandler(async (req, res) => {
     ])
     const totalLikes = await Like.aggregate([
         {
-            $match: {}
+            $match: {
+                video: { $in: await Video.find({ owner: new mongoose.Types.ObjectId(channelId) }).distinct('_id') }
+            }
         },
         {
-            $count: "totalLikes" //count the total likes
+            $count: "totalLikes"
         }
     ]);
 
@@ -72,15 +77,15 @@ const getChannelStats = asyncHandler(async (req, res) => {
 
 const getChannelVideos = asyncHandler(async (req, res) => {
     // TODO: Get all the videos uploaded by the channel
-    const userId = req.user._id;
+    const { channelId } = req.params;
     //check if the user is a valid user
-    if(!mongoose.isValidObjectId(userId)){
+    if(!mongoose.isValidObjectId(channelId)){
         throw new ApiError(400, "Invalid user id");
     }
     const videos = await Video.aggregate([
         {
             $match: {
-                owner: new mongoose.Types.ObjectId(userId)
+                owner: new mongoose.Types.ObjectId(channelId)
             }
         },
         {

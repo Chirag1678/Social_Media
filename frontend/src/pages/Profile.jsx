@@ -15,6 +15,7 @@ import { toggleSubscribtion } from "../utils/Subscription.js";
 import { useForm } from "react-hook-form";
 import { logout } from "../store/authSlice.js";
 import { logoutUser } from "../utils/User.js";
+import { channelStats, channelVideos } from "../utils/Dashboard.js";
 
 const Profile = () => {
   const { profile } = useParams();

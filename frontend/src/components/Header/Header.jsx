@@ -23,6 +23,24 @@ const Header = () => {
     if (user) {
       setCurrentUser(user.data);
     }
+
+    // Get the current URL during load
+    const currentUrl = window.location.pathname;
+
+    // Set selectedPage based on the current pathname
+    if (currentUrl === '/') {
+      setSelectedPage('home');
+    } else if (currentUrl === '/subscribed') {
+      setSelectedPage('subscriptions');
+    } else if (currentUrl === '/history') {
+      setSelectedPage('history');
+    } else if (currentUrl === '/playlists') {
+      setSelectedPage('playlists');
+    } else if (currentUrl === '/liked') {
+      setSelectedPage('liked-videos');
+    } else {
+      setSelectedPage('your-videos'); // Default case
+    }
   }, [user]);
 
   const toggleMenu = () => {
@@ -63,7 +81,7 @@ const Header = () => {
       <div className="flex items-center bg-gray-500/30 px-5 pb-4 pt-2 justify-between">
         <div className="flex items-center gap-5">
           <RxHamburgerMenu className="text-2xl cursor-pointer" onClick={toggleNavBar}/>
-          <div onClick={() => navigate("/")} className="cursor-pointer">
+          <div onClick={()=> {setSelectedPage('home'); navigate('/');}} className="cursor-pointer">
             Logo
           </div>
         </div>
