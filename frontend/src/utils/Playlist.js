@@ -1,8 +1,10 @@
 import axios from 'axios';
-const createPlaylist = async (title,description) => {
+const API_URL = import.meta.env.VITE_API_URL;
+
+const createPlaylist = async (title, description) => {
     try {
-        const response = await axios.post('/api/v1/playlist', {
-            name:title,
+        const response = await axios.post(`${API_URL}/api/v1/playlist`, {
+            name: title,
             description,
         }, {
             withCredentials: true,
@@ -16,24 +18,24 @@ const createPlaylist = async (title,description) => {
 
 const deletePlaylist = async (playlistId) => {
     try {
-        const response = await axios.delete(`/api/v1/playlist/${playlistId}`);
+        const response = await axios.delete(`${API_URL}/api/v1/playlist/${playlistId}`);
         return response.data;
     } catch (error) {
-        console.error("'Error deleting playlist:", error);
+        console.error('Error deleting playlist:', error);
         throw error;
     }
 };
 
 const updatePlaylist = async (playlistId, data) => {
     const formData = new FormData();
-    if(data.name){
+    if (data.name) {
         formData.append('name', data.name);
     }
-    if(data.description){
+    if (data.description) {
         formData.append('description', data.description);
     }
     try {
-        const response = await axios.patch(`/api/v1/playlist/${playlistId}`, formData, {
+        const response = await axios.patch(`${API_URL}/api/v1/playlist/${playlistId}`, formData, {
             headers: {
                 "Content-Type": 'application/json'
             }
@@ -47,7 +49,7 @@ const updatePlaylist = async (playlistId, data) => {
 
 const getUserPlaylists = async (userId) => {
     try {
-        const response = await axios.get(`/api/v1/playlist/user/${userId}`);
+        const response = await axios.get(`${API_URL}/api/v1/playlist/user/${userId}`);
         return response.data;
     } catch (error) {
         console.error('Error fetching playlist data:', error);
@@ -57,7 +59,7 @@ const getUserPlaylists = async (userId) => {
 
 const getPlaylistById = async (playlistId) => {
     try {
-        const response = await axios.get(`/api/v1/playlist/${playlistId}`);
+        const response = await axios.get(`${API_URL}/api/v1/playlist/${playlistId}`);
         return response.data;
     } catch (error) {
         console.error('Error fetching playlist data:', error);
@@ -65,10 +67,9 @@ const getPlaylistById = async (playlistId) => {
     }
 }
 
-const addVideoToPlaylist = async (playlistId,videoId) => {
+const addVideoToPlaylist = async (playlistId, videoId) => {
     try {
-        const response = await axios.patch(`/api/v1/playlist/add/${videoId}/${playlistId}`, {
-        }, {
+        const response = await axios.patch(`${API_URL}/api/v1/playlist/add/${videoId}/${playlistId}`, {}, {
             withCredentials: true,
         });
         return response.data;
@@ -78,10 +79,9 @@ const addVideoToPlaylist = async (playlistId,videoId) => {
     }
 }
 
-const removeVideoFromPlaylist = async (playlistId,videoId) => {
+const removeVideoFromPlaylist = async (playlistId, videoId) => {
     try {
-        const response = await axios.patch(`/api/v1/playlist/remove/${videoId}/${playlistId}`, {
-        }, {
+        const response = await axios.patch(`${API_URL}/api/v1/playlist/remove/${videoId}/${playlistId}`, {}, {
             withCredentials: true,
         });
         return response.data;

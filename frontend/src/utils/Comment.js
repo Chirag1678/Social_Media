@@ -1,8 +1,9 @@
 import axios from 'axios';
+const API_URL = import.meta.env.VITE_API_URL;
 
 const getCommentsById = async (videoId) => {
   try {
-    const response = await axios.get(`/api/v1/comments/${videoId}`);
+    const response = await axios.get(`${API_URL}/api/v1/comments/${videoId}`);
     return response.data;
   } catch (error) {
     console.error('Error fetching video data:', error);
@@ -12,7 +13,7 @@ const getCommentsById = async (videoId) => {
 
 const getTweetCommentsById = async (tweetId) => {
   try {
-    const response = await axios.get(`/api/v1/comments/t/${tweetId}`);
+    const response = await axios.get(`${API_URL}/api/v1/comments/t/${tweetId}`);
     return response.data;
   } catch (error) {
     console.error('Error fetching tweet data:', error);
@@ -22,7 +23,7 @@ const getTweetCommentsById = async (tweetId) => {
 
 const createComment = async (videoId,data) => {
   try {
-    const response = await axios.post(`/api/v1/comments/${videoId}`, {
+    const response = await axios.post(`${API_URL}/api/v1/comments/${videoId}`, {
       content: data.content,
     }, {
       withCredentials: true,
@@ -36,7 +37,7 @@ const createComment = async (videoId,data) => {
 
 const createTweetComment = async (tweetId,data) => {
   try {
-    const response = await axios.post(`/api/v1/comments/t/${tweetId}`, {
+    const response = await axios.post(`${API_URL}/api/v1/comments/t/${tweetId}`, {
       content: data.content,
     }, {
       withCredentials: true,
@@ -50,7 +51,7 @@ const createTweetComment = async (tweetId,data) => {
 
 const deleteComment = async (commentId) => {
   try {
-    const response = await axios.delete(`/api/v1/comments/c/${commentId}`, {
+    const response = await axios.delete(`${API_URL}/api/v1/comments/c/${commentId}`, {
       withCredentials: true,
     });
     return response.data;
@@ -62,7 +63,7 @@ const deleteComment = async (commentId) => {
 
 const updateComment = async (commentId, content) => {
   try {
-    const response = await axios.patch(`/api/v1/comments/c/${commentId}`, {
+    const response = await axios.patch(`${API_URL}/api/v1/comments/c/${commentId}`, {
       content: content.content,
     }, {
       withCredentials: true,
