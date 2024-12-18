@@ -1,9 +1,8 @@
 import axios from 'axios';
-const API_URL = import.meta.env.VITE_API_URL;
 
 const allVideos = async (params) => {
   try {
-    let url = `${API_URL}/api/v1/videos`;  // Default URL
+    let url = `/api/v1/videos`;  // Default URL
     if (params) {
       const { query, page = 1, limit = 10, sortBy, sortType, userId } = params;
       
@@ -17,7 +16,7 @@ const allVideos = async (params) => {
       if (userId) queryParams.append('userId', userId);
       
       // Attach the query parameters to the URL
-      url = `${API_URL}/api/v1/videos?${queryParams.toString()}`;
+      url = `/api/v1/videos?${queryParams.toString()}`;
     }
 
     // Send the request with or without query parameters
@@ -32,7 +31,7 @@ const allVideos = async (params) => {
 
 const getVideoById = async (videoId) => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/videos/${videoId}`);
+    const response = await axios.get(`/api/v1/videos/${videoId}`);
     return response.data;
   } catch (error) {
     console.error('Error fetching video data:', error);
@@ -48,7 +47,7 @@ const createVideo = async (data) => {
     formData.append('status', data.status);
     formData.append('videoFile', data.videoFile[0]);
     formData.append('thumbnail', data.thumbnail[0]);
-    const response = await axios.post(`${API_URL}/api/v1/videos`, formData, {
+    const response = await axios.post(`/api/v1/videos`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -63,7 +62,7 @@ const createVideo = async (data) => {
 
 const deleteVideo = async (videoId) => {
   try {
-    const response = await axios.delete(`${API_URL}/api/v1/videos/${videoId}`);
+    const response = await axios.delete(`/api/v1/videos/${videoId}`);
     return response.data;
   } catch (error) {
     console.error('Error deleting video:', error);
@@ -84,7 +83,7 @@ const updateVideo = async (data, videoId) => {
     if (data.thumbnail && data.thumbnail.length > 0) {
       formData.append('thumbnail', data.thumbnail[0]);
     }
-    const response = await axios.patch(`${API_URL}/api/v1/videos/${videoId}`, formData, {
+    const response = await axios.patch(`/api/v1/videos/${videoId}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -99,7 +98,7 @@ const updateVideo = async (data, videoId) => {
 
 const toggleVideoStatus = async (videoId) => {
   try {
-    const response = await axios.patch(`${API_URL}/api/v1/videos/toggle/publish-status/${videoId}`, {
+    const response = await axios.patch(`/api/v1/videos/toggle/publish-status/${videoId}`, {
       withCredentials: true
     });
     return response.data;

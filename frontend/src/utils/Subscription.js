@@ -1,9 +1,8 @@
 import axios from 'axios';
-const API_URL = import.meta.env.VITE_API_URL;
 
 const toggleSubscribtion = async (channelId) => {
     try {
-        const response = await axios.post(`${API_URL}/api/v1/subscriptions/c/${channelId}`);
+        const response = await axios.post(`/api/v1/subscriptions/c/${channelId}`);
         return response.data;
     } catch (error) {
         console.error("Error subscribing to channel:", error);
@@ -13,7 +12,7 @@ const toggleSubscribtion = async (channelId) => {
 
 const channelSubscribers = async (channelId) => {
     try {
-        const response = await axios.get(`${API_URL}/api/v1/subscriptions/c/${channelId}`);
+        const response = await axios.get(`/api/v1/subscriptions/c/${channelId}`);
         return response.data;
     } catch (error) {
         console.error("Error fetching channel subscribers:", error);
@@ -23,7 +22,7 @@ const channelSubscribers = async (channelId) => {
 
 const getSubscribedChannels = async () => {
     try {
-        const response = await axios.get(`${API_URL}/api/v1/subscriptions/subscribed`);
+        const response = await axios.get(`/api/v1/subscriptions/subscribed`);
         return response.data;
     } catch (error) {
         console.error("Error fetching subscribed channels:", error);

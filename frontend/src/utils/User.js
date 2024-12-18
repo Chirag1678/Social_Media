@@ -1,9 +1,8 @@
 import axios from 'axios';
-const API_URL = import.meta.env.VITE_API_URL;
 
 const currentUser = async () => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/users/current-user`, {
+    const response = await axios.get(`/api/v1/users/current-user`, {
         withCredentials: true,
     });
     return response.data;
@@ -11,7 +10,7 @@ const currentUser = async () => {
     if(error.response.status === 401 && error.response?.data?.message === "Access token has expired"){
         console.error(error);
         try {
-            await axios.post(`${API_URL}/api/v1/users/refresh-token`, {},{
+            await axios.post(`/api/v1/users/refresh-token`, {},{
                 withCredentials: true,
             });
             const retryResponse = await axios.get(`/api/v1/users/current`, {
@@ -20,7 +19,7 @@ const currentUser = async () => {
             return retryResponse.data;
         } catch (refreshError) {
             console.error('Token refresh failed:', refreshError);
-            throw new Error('Token refresh failed. Please log in again.');;
+            throw new Error('Token refresh failed. Please log in again.');
         }
     }
     console.error('Error fetching user data:', error);
@@ -41,7 +40,7 @@ const signUpUser = async (data) => {
       formData.append('coverImage', data.coverImage[0]);
     }   
     try {
-      const response = await axios.post(`${API_URL}/api/v1/users/register`, formData, {
+      const response = await axios.post(`/api/v1/users/register`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -55,7 +54,7 @@ const signUpUser = async (data) => {
 
 const loginUser = async (email, password) => {
     try {
-        const response = await axios.post(`${API_URL}/api/v1/users/login`, {
+        const response = await axios.post(`/api/v1/users/login`, {
             email,
             password,
         }, {
@@ -70,7 +69,7 @@ const loginUser = async (email, password) => {
 
 const logoutUser = async () => {
     try {
-        await axios.post(`${API_URL}/api/v1/users/logout`, {}, {
+        await axios.post(`/api/v1/users/logout`, {}, {
             withCredentials: true,
         });
     } catch (error) {
@@ -81,7 +80,7 @@ const logoutUser = async () => {
 
 const getUserChannel = async (userName) => {
     try {
-        const response = await axios.get(`${API_URL}/api/v1/users/c/${userName}`);
+        const response = await axios.get(`/api/v1/users/c/${userName}`);
         return response.data;
     } catch (error) {
         console.error('Error fetching user channel data:', error);
@@ -93,7 +92,7 @@ const updateUserAvatar = async (file) => {
     const formData = new FormData();
     formData.append('avatar', file);
     try {
-        const response = await axios.patch(`${API_URL}/api/v1/users/update-avatar`, formData, {
+        const response = await axios.patch(`/api/v1/users/update-avatar`, formData, {
             headers: {
                 "Content-Type": 'multipart/form-data'
             },
@@ -110,7 +109,7 @@ const updateUserCoverImage = async (file) => {
     const formData = new FormData();
     formData.append('coverImage', file);
     try {
-        const response = await axios.patch(`${API_URL}/api/v1/users/update-cover-image`, formData, {
+        const response = await axios.patch(`/api/v1/users/update-cover-image`, formData, {
             headers: {
                 "Content-Type": 'multipart/form-data'
             },
@@ -125,7 +124,7 @@ const updateUserCoverImage = async (file) => {
 
 const updateAccountDetails = async (data) => {
     try {
-        const response = await axios.patch(`${API_URL}/api/v1/users/update-profile`, data, {
+        const response = await axios.patch(`/api/v1/users/update-profile`, data, {
             withCredentials: true,
             headers: {
                 'Content-Type': 'application/json'
@@ -140,8 +139,7 @@ const updateAccountDetails = async (data) => {
 
 const getPassword = async () => {
     try {
-        const response = await axios.get(`${API_URL}/api/v1/users/get-password`, {
-
+        const response = await axios.get(`/api/v1/users/get-password`, {
             withCredentials: true
         });
         return response.data;
@@ -156,7 +154,7 @@ const updatePassword = async (data) => {
     formData.append('currentPassword', data.currentPassword);
     formData.append('newPassword', data.newPassword);
     try {
-        const response = await axios.post(`${API_URL}/api/v1/users/change-password`, formData, {
+        const response = await axios.post(`/api/v1/users/change-password`, formData, {
             withCredentials: true,
             headers: {
                 "Content-Type": 'application/json'
@@ -171,7 +169,7 @@ const updatePassword = async (data) => {
 
 const userWatchHistory = async () => {
     try {
-        const response = await axios.get(`${API_URL}/api/v1/users/history`, {
+        const response = await axios.get(`/api/v1/users/history`, {
             withCredentials: true
         });
         return response.data;
