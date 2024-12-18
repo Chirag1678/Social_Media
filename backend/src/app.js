@@ -24,7 +24,7 @@ import likeRouter from "./routes/like.routes.js";
 import commentRouter from "./routes/comment.routes.js";
 import dashboardRouter from "./routes/dashboard.routes.js";
 import healthcheckRouter from "./routes/healthcheck.routes.js";
-import { ApiError } from "./utils/apiError.js";
+import { ApiError } from "./utils/ApiError.js";
 
 //routes declaration
 app.use("/api/v1/healthcheck", healthcheckRouter); //makes it http://localhost:8000/api/v1/healthcheck/:route
