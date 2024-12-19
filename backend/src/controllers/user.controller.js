@@ -130,6 +130,7 @@ const loginUser = asyncHandler(async (req,res) => {
     const cookieOptions={
         httpOnly: true, //httpOnly is used to prevent client side script from accessing the cookie
         secure: true, //secure is used to send the cookie over HTTPS
+        sameSite: 'None', //allows cross-origin requests
     }
     const loggedInUser = await User.findById(user._id).select("-password -refreshToken"); //select is used to select the fields to be returned, -password is used to not return the password field, -refreshToken is used to not return the refreshToken field
     
@@ -153,6 +154,7 @@ const logoutUser = asyncHandler(async (req,res) => {
     const cookieOptions={
         httpOnly: true, //httpOnly is used to prevent client side script from accessing the cookie
         secure: true, //secure is used to send the cookie over HTTPS
+        sameSite: 'None', //allows cross-origin requests
     }
 
     res.status(200)
@@ -184,6 +186,7 @@ const refreshAccessToken = asyncHandler(async (req,res) => {
         const cookieOptions={
             httpOnly: true, // Prevents client-side scripts from accessing the cookie
             secure: true, // Ensures the cookie is only sent over HTTPS
+            sameSite: 'None', //allows cross-origin requests
         }
     
         // Generate new access and refresh tokens
