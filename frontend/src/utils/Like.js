@@ -1,8 +1,11 @@
 import axios from 'axios';
+const Backend_api = import.meta.env.VITE_REACT_APP_URL;
 
 const toggleVideoLike = async (videoId) => {
     try {
-        const response = await axios.post(`/api/v1/likes/toggle/v/${videoId}`);
+        const response = await axios.post(`${Backend_api}/likes/toggle/v/${videoId}`, {}, {
+            withCredentials: true
+        });
         return response.data;
     } catch (error) {
         console.error("Error liking video:", error);
@@ -12,7 +15,9 @@ const toggleVideoLike = async (videoId) => {
 
 const toggleCommentLike = async (commentId) => {
     try {
-        const response = await axios.post(`/api/v1/likes/toggle/c/${commentId}`);
+        const response = await axios.post(`${Backend_api}/likes/toggle/c/${commentId}`, {}, {
+            withCredentials: true
+        });
         return response.data;
     } catch (error) {
         console.error("Error liking comment:", error);
@@ -22,7 +27,9 @@ const toggleCommentLike = async (commentId) => {
 
 const toggleTweetLike = async (tweetId) => {
     try {
-        const response = await axios.post(`/api/v1/likes/toggle/t/${tweetId}`);
+        const response = await axios.post(`${Backend_api}/likes/toggle/t/${tweetId}`, {}, {
+            withCredentials: true
+        });
         return response.data;
     } catch (error) {
         console.error("Error liking tweet:", error);
@@ -32,7 +39,9 @@ const toggleTweetLike = async (tweetId) => {
 
 const getLikedVideos = async () => {
     try {
-        const response = await axios.get(`/api/v1/likes/videos`);
+        const response = await axios.get(`${Backend_api}/likes/videos`, {
+            withCredentials: true
+        });
         return response.data;
     } catch (error) {
         console.error("Error fetching liked videos:", error);
@@ -42,7 +51,9 @@ const getLikedVideos = async () => {
 
 const isLikedVideo = async (videoId) => {
     try {
-        const response = await axios.get(`/api/v1/likes/v/${videoId}`);
+        const response = await axios.get(`${Backend_api}/likes/v/${videoId}`, {
+            withCredentials: true
+        });
         return response.data;
     } catch (error) {
         console.error("Error fetching liked video:", error);
@@ -52,7 +63,9 @@ const isLikedVideo = async (videoId) => {
 
 const isLikedComment = async (commentId) => {
     try {
-        const response = await axios.get(`/api/v1/likes/c/${commentId}`);
+        const response = await axios.get(`${Backend_api}/likes/c/${commentId}`, {
+            withCredentials: true
+        });
         return response.data;
     } catch (error) {
         console.error("Error fetching liked comment:", error);
@@ -62,7 +75,9 @@ const isLikedComment = async (commentId) => {
 
 const isLikedTweet = async (tweetId) => {
     try {
-        const response = await axios.get(`/api/v1/likes/t/${tweetId}`);
+        const response = await axios.get(`${Backend_api}/likes/t/${tweetId}`, {
+            withCredentials: true
+        });
         return response.data;
     } catch (error) {
         console.error("Error fetching liked tweet:", error);

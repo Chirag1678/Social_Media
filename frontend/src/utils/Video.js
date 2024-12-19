@@ -1,8 +1,9 @@
 import axios from 'axios';
+const Backend_api = import.meta.env.VITE_REACT_APP_URL;
 
 const allVideos = async (params) => {
   try {
-    let url = `/api/v1/videos`;  // Default URL
+    let url = `${Backend_api}/videos`;  // Default URL
     if (params) {
       const { query, page = 1, limit = 10, sortBy, sortType, userId } = params;
       
@@ -16,11 +17,13 @@ const allVideos = async (params) => {
       if (userId) queryParams.append('userId', userId);
       
       // Attach the query parameters to the URL
-      url = `/api/v1/videos?${queryParams.toString()}`;
+      url = `${Backend_api}/videos?${queryParams.toString()}`;
     }
 
     // Send the request with or without query parameters
-    const response = await axios.get(url);
+    const response = await axios.get(url, {
+      withCredentials: true,
+    });
     return response.data;
 
   } catch (error) {
@@ -31,7 +34,9 @@ const allVideos = async (params) => {
 
 const getVideoById = async (videoId) => {
   try {
-    const response = await axios.get(`/api/v1/videos/${videoId}`);
+    const response = await axios.get(`${Backend_api}/videos/${videoId}`,{
+      withCredentials: true,
+    });
     return response.data;
   } catch (error) {
     console.error('Error fetching video data:', error);
@@ -47,7 +52,7 @@ const createVideo = async (data) => {
     formData.append('status', data.status);
     formData.append('videoFile', data.videoFile[0]);
     formData.append('thumbnail', data.thumbnail[0]);
-    const response = await axios.post(`/api/v1/videos`, formData, {
+    const response = await axios.post(`${Backend_api}/videos`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -62,7 +67,7 @@ const createVideo = async (data) => {
 
 const deleteVideo = async (videoId) => {
   try {
-    const response = await axios.delete(`/api/v1/videos/${videoId}`);
+    const response = await axios.delete(`${Backend_api}/videos/${videoId}`);
     return response.data;
   } catch (error) {
     console.error('Error deleting video:', error);
@@ -83,7 +88,7 @@ const updateVideo = async (data, videoId) => {
     if (data.thumbnail && data.thumbnail.length > 0) {
       formData.append('thumbnail', data.thumbnail[0]);
     }
-    const response = await axios.patch(`/api/v1/videos/${videoId}`, formData, {
+    const response = await axios.patch(`${Backend_api}/videos/${videoId}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -98,7 +103,7 @@ const updateVideo = async (data, videoId) => {
 
 const toggleVideoStatus = async (videoId) => {
   try {
-    const response = await axios.patch(`/api/v1/videos/toggle/publish-status/${videoId}`, {
+    const response = await axios.patch(`${Backend_api}/videos/toggle/publish-status/${videoId}`, {
       withCredentials: true
     });
     return response.data;

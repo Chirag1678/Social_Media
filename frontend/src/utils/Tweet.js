@@ -1,4 +1,5 @@
-import axios from 'axios'; 
+import axios from 'axios';
+const Backend_api = import.meta.env.VITE_REACT_APP_URL;
 
 const createTweet = async (data) => {
     try {
@@ -7,7 +8,7 @@ const createTweet = async (data) => {
         if(data.image) {
             formData.append('image', data.image[0]);
         }
-        const response = await axios.post(`/api/v1/tweets`, formData, {
+        const response = await axios.post(`${Backend_api}/tweets`, formData, {
             withCredentials: true,
             headers: {
                 'Content-Type': 'multipart/form-data', // Indicate the content type for file uploads
@@ -22,7 +23,9 @@ const createTweet = async (data) => {
 
 const getUserTweets = async (userId) => {
     try {
-        const response = await axios.get(`/api/v1/tweets/user/${userId}`);
+        const response = await axios.get(`${Backend_api}/tweets/user/${userId}`,{
+            withCredentials: true,
+        });
         return response.data;
     } catch (error) {
         console.error('Error fetching tweet data:', error);
@@ -32,7 +35,9 @@ const getUserTweets = async (userId) => {
 
 const getTweetById = async (tweetId) => {
     try {
-        const response = await axios.get(`/api/v1/tweets/${tweetId}`);
+        const response = await axios.get(`${Backend_api}/tweets/${tweetId}`,{
+            withCredentials: true,
+        });
         return response.data;
     } catch (error) {
         console.error('Error fetching tweet data:', error);
@@ -42,7 +47,7 @@ const getTweetById = async (tweetId) => {
 
 const deleteTweet = async (tweetId) => {
     try {
-        const response = await axios.delete(`/api/v1/tweets/${tweetId}`);
+        const response = await axios.delete(`${Backend_api}/tweets/${tweetId}`);
         return response.data;
     } catch (error) {
         console.error('Error deleting tweet:', error);
@@ -59,7 +64,7 @@ const updateTweet = async (data,tweetId) => {
         if(data.image && data.image.length > 0){
             formData.append('image', data.image[0]);
         }
-        const response = await axios.patch(`/api/v1/tweets/${tweetId}`, formData, {
+        const response = await axios.patch(`${Backend_api}/tweets/${tweetId}`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             },
