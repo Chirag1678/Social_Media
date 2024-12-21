@@ -5,10 +5,13 @@ import { deleteVideo, getAllVideos, getVideoById, publishAVideo, togglePublishSt
 
 const router = Router();
 
+//Route without authentication
+router.route("/").get(getAllVideos); 
+
 router.use(verifyJWT); //verifyJWT is used to verify the access token
 
 //secured routes
-router.route("/").get(getAllVideos).post(
+router.route("/").post(
     upload.fields([
         {
             name: "videoFile", 
