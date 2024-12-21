@@ -14,5 +14,6 @@ import ProfileTweets from "./Profile/Tweets";
 import PlaylistCard from "./Playlist/PlaylistCard";
 import TweetCard from "./Tweet/TweetCard";
 import CommentCard from "./Comment/CommentCard";
+import Container from "./container/Container";
 
-export { Login, Signup, AuthLayout, Button, Input, TextArea, Select, Logo, Header, VideoCard, ProfileHome, ProfilePlaylists, ProfileTweets, PlaylistCard, TweetCard, CommentCard };
+export { Login, Signup, AuthLayout, Button, Input, TextArea, Select, Logo, Header, VideoCard, ProfileHome, ProfilePlaylists, ProfileTweets, PlaylistCard, TweetCard, CommentCard, Container };

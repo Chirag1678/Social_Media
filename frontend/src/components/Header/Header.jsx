@@ -1,11 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, createElement } from "react";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../store/authSlice.js";
 import { logoutUser } from "../../utils/User.js";
 import { useNavigate, Outlet, useLocation } from "react-router-dom";
 import { IoMdSearch } from "react-icons/io";
+import { GoHomeFill, GoVideo } from "react-icons/go";
 import { useForm } from "react-hook-form";
+import { FaYoutube } from "react-icons/fa";
+import { MdHistory, MdOutlinePlaylistPlay, MdOutlineSubscriptions } from "react-icons/md";
+import { BiLike } from "react-icons/bi";
 
 const Header = () => {
   const [currentUser, setCurrentUser] = useState(null);
@@ -17,6 +21,38 @@ const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [navBar, setNavBar] = useState(false);
   const [selectedPage, setSelectedPage] = useState('home');
+  const pages = [
+    {
+      page: 'Home',
+      link: '/',
+      Icon: 'GoHomeFill'
+    },
+    {
+      page: 'Subscriptions',
+      link: '/subscribed',
+      Icon: 'MdOutlineSubscriptions'
+    },
+    {
+      page: 'History',
+      link: '/history',
+      Icon: 'MdHistory'
+    },
+    {
+      page: 'Playlists',
+      link: '/',
+      Icon: 'MdOutlinePlaylistPlay'
+    },
+    {
+      page: 'Your Videos',
+      link: '/',
+      Icon: 'GoVideo'
+    },
+    {
+      page: 'Liked Videos',
+      link: '/liked',
+      Icon: 'BiLike'
+    }
+  ];
 
   const { register, handleSubmit, reset } = useForm();
 
@@ -84,25 +120,26 @@ const Header = () => {
     reset();
   }
   return (
-    <div className="flex flex-col min-h-screen">
-      <div className="flex items-center bg-gray-500/30 px-5 pb-4 pt-2 justify-between">
+    <div className="flex flex-col min-h-screen relative">
+      <div className="fixed w-full z-10 flex items-center bg-[#212121] px-5 pb-4 pt-2 justify-between">
         <div className="flex items-center gap-5">
           <RxHamburgerMenu className="text-2xl cursor-pointer" onClick={toggleNavBar}/>
-          <div onClick={()=> {setSelectedPage('home'); navigate('/');}} className="cursor-pointer">
-            Logo
+          <div onClick={()=> {setSelectedPage('home'); navigate('/');}} className="cursor-pointer flex items-center gap-x-3">
+            <FaYoutube className="text-red-500 text-3xl"/>
+            <h1 className="text-xl font-semibold">WatchBuddy</h1>
           </div>
         </div>
-        <form className="flex items-center bg-black px-5 rounded-full" onSubmit={handleSubmit(searchByQuery)}>
+        <form className="flex items-center bg-black pl-5 w-[40vw] rounded-full overflow-hidden" onSubmit={handleSubmit(searchByQuery)}>
         <input
           type="text"
           placeholder="Search"
-          className="bg-black py-3 rounded-full w-[40vw] outline-none"
+          className="bg-black py-3 rounded-full w-full outline-none"
           name="query"
           value={search}
           onChange={e=>setSearch(e.target.value)}
           {...register('query',{required:true})}
         />
-        <button type="submit" className="bg-black text-2xl"><IoMdSearch /></button>
+        <button type="submit" className="bg-[#303030] text-2xl py-3 px-5"><IoMdSearch /></button>
         </form>
         {currentUser ? (
           // Logged-in view
@@ -145,22 +182,50 @@ const Header = () => {
           </div>
         )}
       </div>
-      <div className="flex flex-1">
+      <div className="flex">
         {navBar && (
-          <div className="h-screen w-[20vw] bg-black fixed z-10 py-5 px-6">
-            <div onClick={()=> {setSelectedPage('home'); navigate('/');}} className={`w-full flex cursor-pointer items-center gap-5 ${selectedPage === 'home' ? 'bg-gray-700' : ''} hover:bg-gray-700 py-2 px-3 rounded-xl mb-1`}>Home</div>
-            <div onClick={()=> {setSelectedPage('subscriptions'); navigate('/subscribed');}} className={`w-full flex cursor-pointer items-center gap-5 ${selectedPage === 'subscriptions' ? 'bg-gray-700' : ''} hover:bg-gray-700 py-2 px-3 rounded-xl mb-1`}>Subscriptions</div>
+          <div className="h-screen w-[16vw] bg-[#212121] fixed top-[4.5rem] z-10 py-2">
+            {/* <div onClick={()=> {setSelectedPage('home'); navigate('/');}} className={`w-full flex text-lg cursor-pointer items-center gap-x-5 ${selectedPage === 'home' ? 'bg-[#303030]' : ''} hover:bg-[#303030] py-2 px-7 rounded-lg`}>
+              <GoHomeFill className="text-2xl"/>
+              Home
+            </div> */}
+            {pages.map((data,index)=>(
+              <div key={index}>
+                <div onClick={()=>{setSelectedPage(data.page.trim().toLowerCase().split(" ").join("-")); navigate(data.link)}} className={`w-full flex text-lg cursor-pointer items-center gap-x-5 ${selectedPage === data.page.trim().toLowerCase().split(" ").join("-")? 'bg-[#303030]': ''} hover:bg-[#303030] py-2 px-7 rounded-lg`}>
+                  {createElement({
+                    GoHomeFill,
+                    MdOutlineSubscriptions,
+                    MdHistory,
+                    MdOutlinePlaylistPlay,
+                    GoVideo,
+                    BiLike
+                  }[data.Icon] || GoHomeFill,
+                  {className: "text-2xl"})}
+                  {data.page}
+                </div>
+                {index === 1 && (<>
+                  <hr className="mt-3"/>
+                  <div className="mt-3 px-7 text-lg hover:bg-[#303030] py-2 rounded-lg">You</div>
+                </>
+                )}
+                {index === 5 && <hr className="mt-3"/>}
+              </div>
+            ))}
+            {/* <div onClick={()=> {setSelectedPage('subscriptions'); navigate('/subscribed');}} className={`w-full flex cursor-pointer items-center gap-5 ${selectedPage === 'subscriptions' ? 'bg-[#303030]' : ''} hover:bg-[#303030] py-2 px-3 rounded-xl mb-1`}>
+              <MdOutlineSubscriptions />
+              Subscriptions
+            </div>
             <hr />
             <div className="mt-3">You</div>
-            <div onClick={()=> {setSelectedPage("history"); navigate('/history');}} className={`w-full flex cursor-pointer items-center gap-5 ${selectedPage==='history'?'bg-gray-700': ''} hover:bg-gray-700 py-2 px-3 rounded-xl mb-1`}>History</div>
-            <div onClick={()=> {setSelectedPage("playlists"); navigate('/');}} className={`w-full flex cursor-pointer items-center gap-5 ${selectedPage==='playlists'?'bg-gray-700': ''} hover:bg-gray-700 py-2 px-3 rounded-xl mb-1`}>Playlists</div>
-            <div onClick={()=> {setSelectedPage("your-videos"); navigate('/');}} className={`w-full flex cursor-pointer items-center gap-5 ${selectedPage==='your-videos'?'bg-gray-700': ''} hover:bg-gray-700 py-2 px-3 rounded-xl mb-1`}>Your videos</div>
-            <div onClick={()=> {setSelectedPage("liked-videos"); navigate('/liked');}} className={`w-full flex cursor-pointer items-center gap-5 ${selectedPage==='liked-videos'?'bg-gray-700': ''} hover:bg-gray-700 py-2 px-3 rounded-xl mb-1`}>Liked videos</div>
-            <hr />
+            <div onClick={()=> {setSelectedPage("history"); navigate('/history');}} className={`w-full flex cursor-pointer items-center gap-5 ${selectedPage==='history'?'bg-[#303030]': ''} hover:bg-[#303030] py-2 px-3 rounded-xl mb-1`}>History</div>
+            <div onClick={()=> {setSelectedPage("playlists"); navigate('/');}} className={`w-full flex cursor-pointer items-center gap-5 ${selectedPage==='playlists'?'bg-[#303030]': ''} hover:bg-[#303030] py-2 px-3 rounded-xl mb-1`}>Playlists</div>
+            <div onClick={()=> {setSelectedPage("your-videos"); navigate('/');}} className={`w-full flex cursor-pointer items-center gap-5 ${selectedPage==='your-videos'?'bg-[#303030]': ''} hover:bg-[#303030] py-2 px-3 rounded-xl mb-1`}>Your videos</div>
+            <div onClick={()=> {setSelectedPage("liked-videos"); navigate('/liked');}} className={`w-full flex cursor-pointer items-center gap-5 ${selectedPage==='liked-videos'?'bg-[#303030]': ''} hover:bg-[#303030] py-2 px-3 rounded-xl mb-1`}>Liked videos</div>
+            <hr /> */}
           </div>
         )}
-        <main className={`flex-1 ${navBar ? 'ml-[20vw]' : ''}`}>
-          <Outlet />
+        <main className={`flex-1 ${navBar ? 'ml-[16vw]' : ''} mt-12`}>
+          <Outlet/>
         </main>
       </div>
     </div>

@@ -78,7 +78,7 @@ const Home = () => {
   }
   // console.log(videos.docs);
   return (
-    <div className="w-full mx-auto px-12 py-10 min-h-screen flex flex-wrap justify-between">
+    <div className="w-full mx-auto px-12 py-10 min-h-screen bg-black flex flex-wrap justify-between">
     {videos && videos.map((video) => (
       // <div key={video._id}>
       //   <h1>{video.title}</h1>

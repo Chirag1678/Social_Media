@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux'
 import { login, logout } from './store/authSlice';
 import { useNavigate } from 'react-router-dom';
-import { Header } from './components';
+import { Container, Header } from './components';
 import { currentUser } from './utils/User.js';
 
 function App() {
@@ -58,7 +58,9 @@ function App() {
   // if(loading) return null;
   return (
     <div className="bg-black w-full text-white ">
+      <Container>
       <Header />
+      </Container>
     </div>
   )
 }
