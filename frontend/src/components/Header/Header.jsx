@@ -3,7 +3,7 @@ import { RxHamburgerMenu } from "react-icons/rx";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../store/authSlice.js";
 import { logoutUser } from "../../utils/User.js";
-import { useNavigate, Outlet } from "react-router-dom";
+import { useNavigate, Outlet, useLocation } from "react-router-dom";
 import { IoMdSearch } from "react-icons/io";
 import { useForm } from "react-hook-form";
 
@@ -13,8 +13,9 @@ const Header = () => {
   const user = useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [navBar, setNavBar] = useState(true);
+  const [navBar, setNavBar] = useState(false);
   const [selectedPage, setSelectedPage] = useState('home');
 
   const { register, handleSubmit, reset } = useForm();
@@ -25,24 +26,30 @@ const Header = () => {
     }
 
     // Get the current URL during load
-    const currentUrl = window.location.pathname;
+    const currentUrl = location.pathname;
 
     // Set selectedPage based on the current pathname
-    if (currentUrl === '/') {
-      setSelectedPage('home');
-    } else if (currentUrl === '/subscribed') {
-      setSelectedPage('subscriptions');
-    } else if (currentUrl === '/history') {
-      setSelectedPage('history');
-    } else if (currentUrl === '/playlists') {
-      setSelectedPage('playlists');
-    } else if (currentUrl === '/liked') {
-      setSelectedPage('liked-videos');
-    } else {
-      setSelectedPage('your-videos'); // Default case
-    }
-  }, [user]);
+    setSelectedPage(
+      currentUrl === "/"
+        ? "home"
+        : currentUrl === "/subscribed"
+        ? "subscriptions"
+        : currentUrl === "/history"
+        ? "history"
+        : currentUrl === "/playlists"
+        ? "playlists"
+        : currentUrl === "/liked"
+        ? "liked-videos"
+        : "your-videos"
+    );
+  }, [user, location.pathname]);
 
+  useEffect(() => {
+    const currentUrl = location.pathname;
+    const isVideoPage = currentUrl.startsWith("/video/") && currentUrl.split('/').length===3;
+    setNavBar(!isVideoPage);
+  }, [location.pathname]);
+  
   const toggleMenu = () => {
     setMenuOpen((prev) => !prev);
   };

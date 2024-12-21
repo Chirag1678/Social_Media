@@ -19,6 +19,7 @@ const Login = () => {
             const response = await loginUser(data.email, data.password); // Using loginUser from user.js
             dispatch(authLogin(response.user));
             navigate("/");
+            window.location.reload();
         } catch (error) {
             const errorMessage = error?.response?.data?.message || "An error occurred during login";
             setError(errorMessage);
